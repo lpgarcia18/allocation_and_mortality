@@ -32,6 +32,7 @@ completed_base$TAX_PPP_LAGGED3 <- round(completed_base$TAX_PPP_LAGGED3,0)
 #########################################################################
 #Correlation between treatmente and instrumental variable
 cor(completed_base$PUBLIC_EXP_LAGGED2, completed_base$TAX_PPP_LAGGED3, method = "spearman")
+lm(PUBLIC_EXP_LAGGED2 ~ TAX_PPP_LAGGED3, completed_base) %>% summary()
 
 # Impact on Neontatal Mortality -------------------------------------------
 
@@ -44,7 +45,7 @@ governance <- c("CONTROL_CORRUPTION_LAGGED", "GOV_EFFECTIVENESS_LAGGED",
                 "POLITICAL_STABILITY_LAGGED", "REGULATORY_QUALITY_LAGGED", "RULE_OF_LAW_LAGGED")
 sanitation <- c("BASIC_SANITATION_LAGGED", "BASIC_WATER_LAGGED")
 economy_income <- c("GDP_PPP_LAGGED1", "GINI_LAGGED","POVERTY_GAP_LAGGED",           
-"INFLATION_LAGGED", "UNEMPLOYMENT_LAGGED", "OOP_PPP_LAGGED1")
+"INFLATION_LAGGED", "UNEMPLOYMENT_LAGGED", "OOP_PPP_LAGGED4")
 health <- c("DOCTORS_LAGGED", "DELIVERY_ASSISTANCE_LAGGED", "AIDS_PREVALENCE_LAGGED",       
 "MALARIA_INCIDENCE_LAGGED", "DPT_LAGGED", "HOSPITAL_BEDS_LAGGED")
 nutrition <- c("UNDERNOURISHMENT_LAGGED")

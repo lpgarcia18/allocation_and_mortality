@@ -37,7 +37,7 @@ variaveis <- c("LOCATION","PUBLIC_EXP_LAGGED2", "PROP_PUBLIC_HEALTH_EXP_LAGGED2"
 base_dea <- dplyr::select(base_dea, variaveis) 
 base_dea <- subset(base_dea, base_dea$PRED_NEO_U5 >= 0)
 base_dea <- base_dea[,c(1,4,5,9,10,6)]
-base_dea <- subset(base_dea, base_dea$LOCATION != "Madagascar")
+#base_dea <- subset(base_dea, base_dea$LOCATION != "Madagascar")
 base_dea_poor <- subset(base_dea, base_dea$INCOME_CLASS %in% c("L", "LM"))
 base_dea_rich <- subset(base_dea, base_dea$INCOME_CLASS %in% c("UM", "H"))
 base_dea <- rbind(base_dea_poor, base_dea_rich)

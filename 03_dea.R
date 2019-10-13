@@ -35,9 +35,9 @@ variaveis <- c("LOCATION","PUBLIC_EXP_LAGGED2", "PROP_PUBLIC_HEALTH_EXP_LAGGED2"
                "PRED_NEO_U5", "INCOME_CLASS", "DELTA_RATE_NEO", "DELTA_RATE_NEO_U5", "HEALTH", "NON_HEALTH") 
 
 base_dea <- dplyr::select(base_dea, variaveis) 
-base_dea <- subset(base_dea, base_dea$PRED_NEO_U5 >= 0)
 base_dea <- base_dea[,c(1,4,5,9,10,6)]
-#base_dea <- subset(base_dea, base_dea$LOCATION != "Madagascar")
+base_dea$PRED_NEO <- -1*base_dea$PRED_NEO
+base_dea$PRED_NEO_U5 <- -1*base_dea$PRED_NEO_U5
 base_dea_poor <- subset(base_dea, base_dea$INCOME_CLASS %in% c("L", "LM"))
 base_dea_rich <- subset(base_dea, base_dea$INCOME_CLASS %in% c("UM", "H"))
 base_dea <- rbind(base_dea_poor, base_dea_rich)
@@ -49,8 +49,8 @@ base_dea1 <- read_data(datadea = base_dea,
                         inputs = c(4:5) ,
                         outputs = c(2:3))
 model_voo <- model_sbmeff(datadea = base_dea1,
-                              dmu_ref = 1:104, #All countries
-                              dmu_eval =  1:35, #Poor countries (L, LM)
+                              dmu_ref = 1:nrow(base_dea), #All countries
+                              dmu_eval =  1:nrow(base_dea_poor), #Poor countries (L, LM)
                               orientation = "oo",
                               rts = "vrs",
                               compute_target = TRUE,
@@ -73,7 +73,7 @@ efi$TARG_PROP <- efi$TARG_HEALT/(efi$TARG_HEALT+efi$TARG_NON_HEALTH)
 efi$LOCATION <- row.names(efi)
 
 base_efi <- merge(pred, efi, by = "LOCATION")
-
+base_efi[,c(58,59)] <- -1*base_efi[,c(57,58)]
 #########################################################################
 #Saving the databases
 #########################################################################

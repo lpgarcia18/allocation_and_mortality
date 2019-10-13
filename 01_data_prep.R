@@ -204,13 +204,13 @@ fertility$Total <- as.numeric(fertility$Total)
 fertility$LOCATION <- gsub(", Fertility", "",fertility$LOCATION)
 names(fertility) <- c('YEAR', 'FERTILITY_RATE','LOCATION')
 
-fertility <- subset(fertility, fertility$YEAR %in% c(2009:2010))
+fertility <- subset(fertility, fertility$YEAR %in% c(2011:2012))
 fertility <- fertility %>%
    group_by(LOCATION) %>%
    summarize(FERTILITY_RATE_LAGGED = mean(FERTILITY_RATE, na.rm = T))
 #65 years old + 
 population_65 <- subset(population,population$age %in% c("65 to 69", "70+ years", "All Ages"))
-population_65 <- subset(population_65, population_65$year %in% c(2009:2010))
+population_65 <- subset(population_65, population_65$year %in% c(2011:2012))
 population_65 <- dcast(population_65, location  ~ age, value.var = "val", fun.aggregate = mean)
 population_65$PLUS_65_YEARS_LAGGED <- (population_65$`65 to 69` + population_65$`70+ years`)/population_65$`All Ages`
 population_65$`65 to 69` <- NULL
@@ -386,13 +386,12 @@ who <- unnest(who_deflac)
 
 #Calculating Proportion of Public Health Expenditure
 who$PROP_PUBLIC_HEALTH_EXP <- who$HEALTH_PPP/who$PUBLIC_EXP
-who <- dplyr::select(who, LOCATION, YEAR, GDP_PPP, PUBLIC_EXP, PROP_PUBLIC_HEALTH_EXP, TAX_PPP, OOP_PPP)
+who <- dplyr::select(who, LOCATION, YEAR, GDP_PPP, PUBLIC_EXP, PROP_PUBLIC_HEALTH_EXP, OOP_PPP)
 #Excluding countries without information
 who <- na.omit(who)
 who <- subset(who, who$GDP_PPP != 0)
 who <- subset(who, who$PUBLIC_EXP != 0)
 who <- subset(who, who$PROP_PUBLIC_HEALTH_EXP != 0)
-who <- subset(who, who$TAX_PPP != 0)
 
 #Estimanting lagged 
 who_lagged1 <- subset(who, who$YEAR %in% c(2015))
@@ -409,10 +408,6 @@ who_lagged2 <- who_lagged2 %>%
    summarize(PROP_PUBLIC_HEALTH_EXP_LAGGED2 = mean(PROP_PUBLIC_HEALTH_EXP, na.rm = T))
 who_lagged2 <- merge(who_lagged2, who_lagged2_PUBLIC_EXP[,c(1,4)], by = "LOCATION")
 
-who_lagged3 <- subset(who, who$YEAR %in% c(2011:2012))
-who_lagged3 <- who_lagged3[,c(1,2,6)]
-who_lagged3 <- dcast(who_lagged3, LOCATION ~ YEAR, value.var = "TAX_PPP")
-who_lagged3$TAX_PPP_LAGGED3 <- who_lagged3$`2012` - who_lagged3$`2011`
 
 who_lagged4 <- subset(who, who$YEAR %in% c(2009:2010))
 who_lagged4 <- who_lagged4 %>% 
@@ -420,9 +415,7 @@ who_lagged4 <- who_lagged4 %>%
    summarize(OOP_PPP_LAGGED4 = mean(OOP_PPP, na.rm = T))
 
 
-
 who <- merge(who_lagged1, who_lagged2, by = "LOCATION")
-who <- merge(who, who_lagged3[,c(1,4)], by = "LOCATION")
 who <- merge(who, who_lagged4, by = "LOCATION")
 
 
@@ -449,7 +442,24 @@ coord_countries[which(coord_countries$LOCATION == "Egypt"), 1] <- "Egypt, Arab R
 coord_countries[which(coord_countries$LOCATION == "Republic of Korea"), 1] <- "Korea, Rep."
 coord_countries[which(coord_countries$LOCATION == "Mauritania"), 1] <- "Mauritius"
 coord_countries[which(coord_countries$LOCATION == "Macedonia"), 1] <- "North Macedonia"
-coord_countries[which(coord_countries$LOCATION == "Republic Slovakia"), 1] <- "Slovak"
+coord_countries[which(coord_countries$LOCATION == "Slovakia"), 1] <- "Slovak Republic"
+coord_countries[which(coord_countries$LOCATION == "Democratic Republic of the Congo"), 1] <- "Congo, Dem. Rep."
+coord_countries[which(coord_countries$LOCATION == "The Gambia"), 1] <- "Gambia, The"
+coord_countries[which(coord_countries$LOCATION == "Dominican Republic"), 1] <- "Dominica"
+coord_countries[which(coord_countries$LOCATION == "Iran"), 1] <- "Iran, Islamic Rep."
+coord_countries[which(coord_countries$LOCATION == "Kyrgyzstan"), 1] <- "Kyrgyz Republic"
+coord_countries[which(coord_countries$LOCATION == "Mauritius"), 1] <- "Mauritania"
+coord_countries[which(coord_countries$LOCATION == "Dem. Rep. Korea"), 1] <- "North Korea"
+coord_countries[which(coord_countries$LOCATION == "Bahamas"), 1] <- "Bahamas, The"
+coord_countries[which(coord_countries$LOCATION == "Yemen"), 1] <- "Yemen, Rep."
+
+
+base[which(base$LOCATION == "Democratic Republic of the Congo"), 1] <- "Congo, Dem. Rep."
+base[which(base$LOCATION == "Brunei"), 1] <- "Brunei Darussalam"
+base[which(base$LOCATION == "The Gambia"), 1] <- "Gambia, The"
+base[which(base$LOCATION == "Iran"), 1] <- "Iran, Islamic Rep."
+base[which(base$LOCATION == "Laos"), 1] <- "Lao PDR"
+base[which(base$LOCATION == "Yemen"), 1] <- "Yemen, Rep."
 
 
 #Mergin all the indicators
@@ -458,7 +468,7 @@ base <- merge(base, wb1, by = "LOCATION", all.x = T)
 base <- merge(base, income_class, by = "LOCATION", all.x = T)
 base <- merge(base, coord_countries, by = "LOCATION", all.x = T)
 #Excludina countries without mortality and centroid data
-base <- base[which(!is.na(base$RATE_NEO_2016)), ]
+base <- base[which(!is.na(base$DELTA_RATE_NEO)), ]
 base <- base[which(!is.na(base$X)), ]
 names(base)[which(names(base) == "X")] <- "LONG" 
 names(base)[which(names(base) == "Y")] <- "LAT" 

@@ -23,20 +23,16 @@ library(gt)
 #########################################################################
 completed_base <- read_csv("bases/completed_base.csv")
 names(completed_base)[1] <- "LOCATION"
-completed_base$PUBLIC_EXP_LAGGED2 <- round(completed_base$PUBLIC_EXP_LAGGED2,0) 
-completed_base$TAX_PPP_LAGGED3 <- round(completed_base$TAX_PPP_LAGGED3,0) 
+#completed_base$PUBLIC_EXP_LAGGED2 <- round(completed_base$PUBLIC_EXP_LAGGED2,0) 
+#completed_base$TAX_PPP_LAGGED3 <- round(completed_base$TAX_PPP_LAGGED3,0) 
 
 
 #########################################################################
 #Impact of Public Expenditure on Mortality
 #########################################################################
-#Correlation between treatmente and instrumental variable
-cor(completed_base$PUBLIC_EXP_LAGGED2, completed_base$TAX_PPP_LAGGED3, method = "spearman")
-lm(PUBLIC_EXP_LAGGED2 ~ TAX_PPP_LAGGED3, completed_base) %>% summary()
-
 # Impact on Neontatal Mortality -------------------------------------------
 
-demography <- c("FERTILITY_RATE_LAGGED","PLUS_65_YEARS_LAGGED","URBAN_RATE_LAGGED")
+demography <- c("FERTILITY_RATE_LAGGED","URBAN_RATE_LAGGED")
 geography <- c("LONG", "LAT", "SURFACE")
 women_empowerment <- c("UNEMPLOYMENT_FEM_LAGGED", "SCHOOL_FEM_LAGGED",            
 "WOMEN_PARLIAMENT_LAGGED")
@@ -51,22 +47,19 @@ health <- c("DOCTORS_LAGGED", "DELIVERY_ASSISTANCE_LAGGED", "AIDS_PREVALENCE_LAG
 nutrition <- c("UNDERNOURISHMENT_LAGGED")
 energy <- c("ELECTRICITY_LAGGED")
 
-
+#"PLUS_65_YEARS_LAGGED",
 external_factors <- c(governance, economy_income, demography, geography, sanitation, 
                       women_empowerment,schooling,  
                       nutrition, health, energy)
 
 
 Y_neo <- completed_base$DELTA_RATE_NEO
-Y_u5 <- completed_base$DELTA_RATE_U5
 Y_neo_u5 <- completed_base$DELTA_RATE_NEO_U5
 X <- dplyr::select(completed_base, external_factors)
 W <- completed_base$PUBLIC_EXP_LAGGED2
-Z <- completed_base$TAX_PPP_LAGGED3
+Z <- completed_base$PLUS_65_YEARS_LAGGED
 Y_neo.forest <- regression_forest(X, Y_neo, seed = 233)
 Y_neo.hat <- predict(Y_neo.forest)$predictions
-Y_u5.forest <- regression_forest(X, Y_u5, seed = 233)
-Y_u5.hat <- predict(Y_u5.forest)$predictions
 Y_neo_u5.forest <- regression_forest(X, Y_neo_u5, seed = 233)
 Y_neo_u5.hat <- predict(Y_neo_u5.forest)$predictions
 W.forest <- regression_forest (X , W, seed = 233)

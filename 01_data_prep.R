@@ -63,7 +63,7 @@ ODA <- wb(indicator = "DT.ODA.ALLD.GD.ZS", startdate = 2009, enddate = 2016)
 #GDP deflator: linked series (base year varies by country)
 deflator <- wb(indicator = "NY.GDP.DEFL.ZS.AD", startdate = 2009, enddate = 2016)
 
-#INSTRUMENTAL VARIABLE
+
 #Tax revenue (% of GDP)
 TAX <- wb(indicator = "GC.TAX.TOTL.GD.ZS", startdate = 2009, enddate = 2016)
 
@@ -352,6 +352,40 @@ wb1 <- wb1 %>%
       SURFACE = mean(SURFACE,na.rm = T)
       )
 
+all_pop <- subset(population, population$age == "All Ages")
+all_pop <- subset(all_pop, all_pop$year == c(2009,2010))
+all_pop <- all_pop %>%
+   group_by(location) %>%
+   summarise(pop = mean(val, na.rm = T))
+names(all_pop)[1] <- "LOCATION"
+all_pop[which(all_pop$LOCATION == "Republic of the Congo"), 1] <- "Congo, Rep."
+all_pop[which(all_pop$LOCATION == "Côte d'Ivoire"), 1] <- "Cote d'Ivoire"
+all_pop[which(all_pop$LOCATION == "Egypt"), 1] <- "Egypt, Arab Rep."
+all_pop[which(all_pop$LOCATION == "Republic of Korea"), 1] <- "Korea, Rep."
+all_pop[which(all_pop$LOCATION == "Macedonia"), 1] <- "North Macedonia"
+all_pop[which(all_pop$LOCATION == "Slovakia"), 1] <- "Slovak Republic"
+all_pop[which(all_pop$LOCATION == "Democratic Republic of the Congo"), 1] <- "Congo, Dem. Rep."
+all_pop[which(all_pop$LOCATION == "The Gambia"), 1] <- "Gambia, The"
+all_pop[which(all_pop$LOCATION == "Dominican Republic"), 1] <- "Dominica"
+all_pop[which(all_pop$LOCATION == "Iran"), 1] <- "Iran, Islamic Rep."
+all_pop[which(all_pop$LOCATION == "Kyrgyzstan"), 1] <- "Kyrgyz Republic"
+all_pop[which(all_pop$LOCATION == "Dem. Rep. Korea"), 1] <- "North Korea"
+all_pop[which(all_pop$LOCATION == "Bahamas"), 1] <- "Bahamas, The"
+all_pop[which(all_pop$LOCATION == "Yemen"), 1] <- "Yemen, Rep."
+all_pop[which(all_pop$LOCATION == "The Bahamas"), 1] <- "Bahamas, The"
+all_pop[which(all_pop$LOCATION == "North Korea"), 1] <- "Korea, Dem. People’s Rep."
+all_pop[which(all_pop$LOCATION == "South Korea"), 1] <- "Korea, Rep."
+all_pop[which(all_pop$LOCATION == "Laos"), 1] <- "Lao PDR"
+all_pop[which(all_pop$LOCATION == "Macedonia, FYR"), 1] <- "North Macedonia"
+all_pop[which(all_pop$LOCATION == "Federated States of Micronesia"), 1] <- "Micronesia, Fed. Sts."
+all_pop[which(all_pop$LOCATION == "Venezuela"), 1] <- "Venezuela, RB"
+all_pop[which(all_pop$LOCATION == "Congo"), 1] <- "Congo, Rep."
+all_pop[which(all_pop$LOCATION == "Brunei"), 1] <- "Brunei Darussalam"
+
+wb1 <- merge(wb1, all_pop, by = "LOCATION", all.x = T)
+
+wb1$POP_DENS <- wb1$pop/wb1$SURFACE #Populational density
+wb1$SURFACE <- NULL
 wb2 <- Reduce(function(x, y) merge(x, y, by = c("LOCATION", "YEAR"),  all=TRUE), 
       list(ODA, deflator, TAX))
 
@@ -440,7 +474,6 @@ coord_countries[which(coord_countries$LOCATION == "Republic of the Congo"), 1] <
 coord_countries[which(coord_countries$LOCATION == "Côte d'Ivoire"), 1] <- "Cote d'Ivoire"
 coord_countries[which(coord_countries$LOCATION == "Egypt"), 1] <- "Egypt, Arab Rep."
 coord_countries[which(coord_countries$LOCATION == "Republic of Korea"), 1] <- "Korea, Rep."
-coord_countries[which(coord_countries$LOCATION == "Mauritania"), 1] <- "Mauritius"
 coord_countries[which(coord_countries$LOCATION == "Macedonia"), 1] <- "North Macedonia"
 coord_countries[which(coord_countries$LOCATION == "Slovakia"), 1] <- "Slovak Republic"
 coord_countries[which(coord_countries$LOCATION == "Democratic Republic of the Congo"), 1] <- "Congo, Dem. Rep."
@@ -448,7 +481,6 @@ coord_countries[which(coord_countries$LOCATION == "The Gambia"), 1] <- "Gambia, 
 coord_countries[which(coord_countries$LOCATION == "Dominican Republic"), 1] <- "Dominica"
 coord_countries[which(coord_countries$LOCATION == "Iran"), 1] <- "Iran, Islamic Rep."
 coord_countries[which(coord_countries$LOCATION == "Kyrgyzstan"), 1] <- "Kyrgyz Republic"
-coord_countries[which(coord_countries$LOCATION == "Mauritius"), 1] <- "Mauritania"
 coord_countries[which(coord_countries$LOCATION == "Dem. Rep. Korea"), 1] <- "North Korea"
 coord_countries[which(coord_countries$LOCATION == "Bahamas"), 1] <- "Bahamas, The"
 coord_countries[which(coord_countries$LOCATION == "Yemen"), 1] <- "Yemen, Rep."
@@ -484,6 +516,9 @@ completed_base <- mice::complete(temp_base,1)
 completed_base <- cbind(dplyr::select(base, LOCATION, INCOME_CLASS), completed_base) %>% as.data.frame()
 densityplot(temp_base)
 
+
+completed_base <- subset(completed_base, completed_base$DELTA_RATE_NEO < 0)
+completed_base <- subset(completed_base, completed_base$DELTA_RATE_NEO_U5 < 0)
 #########################################################################
 #Saving the databases
 #########################################################################

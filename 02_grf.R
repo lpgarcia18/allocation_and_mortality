@@ -32,8 +32,8 @@ names(completed_base)[1] <- "LOCATION"
 #########################################################################
 # Impact on Neontatal Mortality -------------------------------------------
 
-demography <- c("FERTILITY_RATE_LAGGED","URBAN_RATE_LAGGED")
-geography <- c("LONG", "LAT", "SURFACE")
+demography <- c("FERTILITY_RATE_LAGGED","URBAN_RATE_LAGGED", "POP_DENS", "pop")
+geography <- c("LONG", "LAT")
 women_empowerment <- c("UNEMPLOYMENT_FEM_LAGGED", "SCHOOL_FEM_LAGGED",            
 "WOMEN_PARLIAMENT_LAGGED")
 schooling <- c("SCHOOL_LIFE_EXP_LAGGED", "OUT_OF_SCHOOL_LAGGED")
@@ -66,7 +66,7 @@ W.forest <- regression_forest (X , W, seed = 233)
 W.hat <- predict(W.forest)$predictions
 Z.forest <- regression_forest(X, Z, seed = 233)
 Z.hat <- predict(Z.forest)$predictions
-#Impact neo
+#Effect neo
 iv_neo_raw <- instrumental_forest(X, Y_neo, W, Z,
                     Y_neo.hat, W.hat, Z.hat,
                     mtry = sqrt(ncol(X)),
@@ -94,7 +94,7 @@ pred_neo$IC_05_NEO <- pred_neo$predictions-1.96*(pred_neo$SE)
 
 
  
-#Impact neo_u5
+#Effect neo_u5
 iv_neo_u5_raw <- instrumental_forest(X, Y_neo_u5, W, Z,
                     Y_neo_u5.hat, W.hat, Z.hat,
                     mtry = sqrt(ncol(X)),
@@ -121,6 +121,9 @@ pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-1.96*(pred_neo_u5$SE)
 
 
 pred <- cbind(completed_base, pred_neo[,c(5,9,8)], pred_neo_u5[,c(5,9,8)])
+pred$IMPACT_NEO <- pred$PRED_NEO * pred$PUBLIC_EXP_LAGGED2
+pred$IMPACT_NEO_U5 <- pred$PRED_NEO_U5 * pred$PUBLIC_EXP_LAGGED2
+
 
 #########################################################################
 #Saving the databases

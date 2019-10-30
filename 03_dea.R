@@ -35,8 +35,8 @@ variaveis <- c("LOCATION", "INCOME_CLASS", "IMPACT_NEO",
                "IMPACT_NEO_U5", "HEALTH", "NON_HEALTH") 
 
 base_dea <- dplyr::select(base_dea, variaveis) 
-base_dea$IMPACT_NEO <- -1*base_dea$IMPACT_NEO #Transforming in positive to use in DEA
-base_dea$IMPACT_NEO_U5 <- -1*base_dea$IMPACT_NEO_U5 #Transforming in positive to use in DEA
+base_dea$IMPACT_NEO <- base_dea$IMPACT_NEO 
+base_dea$IMPACT_NEO_U5 <- base_dea$IMPACT_NEO_U5 
 base_dea_poor <- subset(base_dea, base_dea$INCOME_CLASS %in% c("L", "LM"))
 base_dea_rich <- subset(base_dea, base_dea$INCOME_CLASS %in% c("UM", "H"))
 base_dea <- rbind(base_dea_poor, base_dea_rich)
@@ -58,20 +58,21 @@ model_voo <- model_sbmeff(datadea = base_dea1,
 
 efi_voo <- efficiencies(model_voo)
 
-efi_targ_inp_helth <- targets(model_voo)[[1]][,1]
-efi_targ_inp_non_helth <- targets(model_voo)[[1]][,2]
-efi_targ_impact_neo <- targets(model_voo)[[2]][,1] * -1 #Returning to negative
-efi_targ_impact_neo_u5 <- targets(model_voo)[[2]][,2] * -1 #Returning to negative
+efi_targ_helth <- targets(model_voo)[[1]][,1]
+efi_targ_non_helth <- targets(model_voo)[[1]][,2]
+efi_targ_impact_neo <- targets(model_voo)[[2]][,1] 
+efi_targ_impact_neo_u5 <- targets(model_voo)[[2]][,2] 
 
 efi <- data.frame(EFI = efi_voo,
-                  TARG_HEALTH = efi_targ_inp_helth, 
-                  TARG_NON_HEALTH = efi_targ_inp_non_helth,
+                  TARG_HEALTH = efi_targ_helth, 
+                  TARG_NON_HEALTH = efi_targ_non_helth,
                   TARG_IMPACT_NEO = efi_targ_impact_neo,
                   TARG_IMPACT_NEO_U5 = efi_targ_impact_neo_u5)
 efi$TARG_PROP <- efi$TARG_HEALT/(efi$TARG_HEALT+efi$TARG_NON_HEALTH)
 efi$LOCATION <- row.names(efi)
 
 base_efi <- merge(pred, efi, by = "LOCATION")
+
 
 #########################################################################
 #Saving the databases

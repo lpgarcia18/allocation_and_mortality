@@ -22,7 +22,6 @@ library(deaR)
 #########################################################################
 # GBD -----------------------------------------------------------------
 #Population
-population_05_09 <- read_csv("bases/GBD/Population/IHME_GBD_2017_POP_2005_2009_Y2018M11D08.CSV")
 population_10_14 <- read_csv("bases/GBD/Population/IHME_GBD_2017_POP_2010_2014_Y2018M11D08.CSV")
 population_15_17 <- read_csv("bases/GBD/Population/IHME_GBD_2017_POP_2015_2017_Y2018M11D08.CSV")
 
@@ -59,83 +58,84 @@ new_cache <- wbcache()
 
 #OUTCOME
 #Net ODA received (% of GDP)
-ODA <- wb(indicator = "DT.ODA.ALLD.GD.ZS", startdate = 2009, enddate = 2016)
+ODA <- wb(indicator = "DT.ODA.ALLD.GD.ZS", startdate = 2010, enddate = 2016)
 #GDP deflator: linked series (base year varies by country)
-deflator <- wb(indicator = "NY.GDP.DEFL.ZS.AD", startdate = 2009, enddate = 2016)
+deflator <- wb(indicator = "NY.GDP.DEFL.ZS.AD", startdate = 2010, enddate = 2016)
 
 
 #Tax revenue (% of GDP)
-TAX <- wb(indicator = "GC.TAX.TOTL.GD.ZS", startdate = 2009, enddate = 2016)
+TAX <- wb(indicator = "GC.TAX.TOTL.GD.ZS", startdate = 2010, enddate = 2016)
 
 #ECONOMIC/INCOME
 #GINI index (World Bank estimate)
-GINI <- wb(indicator = "SI.DST.10TH.10", startdate = 2009, enddate = 2010)
+GINI <- wb(indicator = "SI.DST.10TH.10", startdate = 2010, enddate = 2012)
 #Poverty gap at $1.90 a day (2011 PPP) (%)
-POVERTY_GAP <- wb(indicator = "SI.POV.GAPS", startdate = 2009, enddate = 2010)
+POVERTY_GAP <- wb(indicator = "SI.POV.GAPS", startdate = 2010, enddate = 2012)
 #Inflation, consumer prices (annual %)
-INFLATION <- wb(indicator = "FP.CPI.TOTL.ZG", startdate = 2009, enddate = 2010)
+INFLATION <- wb(indicator = "FP.CPI.TOTL.ZG", startdate = 2010, enddate = 2012)
 #Unemployment, total (% of total labor force) (modeled ILO estimate)
-UNEMPLOYMENT <- wb(indicator = "SL.UEM.TOTL.ZS", startdate = 2009, enddate = 2010)
+UNEMPLOYMENT <- wb(indicator = "SL.UEM.TOTL.ZS", startdate = 2010, enddate = 2012)
 
 #SANITATION
 #People using basic sanitation services (% of population)
-BASIC_SANITATION <- wb(indicator = "SH.STA.BASS.ZS", startdate = 2009, enddate = 2010)
+BASIC_SANITATION <- wb(indicator = "SH.STA.BASS.ZS", startdate = 2010, enddate = 2012)
 #People using basic drinking water services (% of population)
-BASIC_WATER <- wb(indicator = "SH.H2O.BASW.ZS", startdate = 2009, enddate = 2010)
+BASIC_WATER <- wb(indicator = "SH.H2O.BASW.ZS", startdate = 2010, enddate = 2012)
 
 #FEMALE EMPOWERMENT
 #Unemployment, female (% of female labor force) (modeled ILO estimate)
-UNEMPLOYMENT_FEM <- wb(indicator = "SL.UEM.TOTL.FE.ZS", startdate = 2009, enddate = 2010)
+UNEMPLOYMENT_FEM <- wb(indicator = "SL.UEM.TOTL.FE.ZS", startdate = 2010, enddate = 2012)
 #School life expectancy, secondary, female (years)
-SCHOOL_FEM <- wb(indicator = "UIS.SLE.23.F", startdate = 2009, enddate = 2010)
+SCHOOL_FEM <- wb(indicator = "UIS.SLE.23.F", startdate = 2010, enddate = 2012)
 #Proportion of seats held by women in national parliaments (%)
-WOMEN_PARLIAMENT <- wb(indicator = "SG.GEN.PARL.ZS", startdate = 2009, enddate = 2010)
+WOMEN_PARLIAMENT <- wb(indicator = "SG.GEN.PARL.ZS", startdate = 2010, enddate = 2012)
 
 #SCHOOL
 #School life expectancy, secondary, both sexes (years)
-SCHOOL_LIFE_EXP <- wb(indicator = "UIS.SLE.23", startdate = 2009, enddate = 2010)
+SCHOOL_LIFE_EXP <- wb(indicator = "UIS.SLE.23", startdate = 2010, enddate = 2012)
 #Rate of out-of-school adolescents of lower secondary school age, both sexes (%)
-OUT_OF_SCHOOL <- wb(indicator = "UIS.ROFST.2", startdate = 2009, enddate = 2010)
+OUT_OF_SCHOOL <- wb(indicator = "UIS.ROFST.2", startdate = 2010, enddate = 2012)
 
 #GOVERNANCE
 #Control of Corruption: Estimate	
-CONTROL_CORRUPTION <- wb(indicator = "CC.EST", startdate = 2010, enddate = 2010)
+CONTROL_CORRUPTION <- wb(indicator = "CC.EST", startdate = 2010, enddate = 2012)
 #Government Effectiveness: Estimate	
-GOV_EFFECTIVENESS <- wb(indicator = "GE.EST", startdate = 2010, enddate = 2010)
+GOV_EFFECTIVENESS <- wb(indicator = "GE.EST", startdate = 2010, enddate = 2012)
 #Political Stability and Absence of Violence/Terrorism: Estimate	
-POLITICAL_STABILITY <- wb(indicator = "PV.EST", startdate = 2010, enddate = 2010)
+POLITICAL_STABILITY <- wb(indicator = "PV.EST", startdate = 2010, enddate = 2012)
 #Regulatory Quality: Estimate	
-REGULATORY_QUALITY <- wb(indicator = "RQ.EST", startdate = 2010, enddate = 2010)
+REGULATORY_QUALITY <- wb(indicator = "RQ.EST", startdate = 2010, enddate = 2012)
 #Rule of Law: Estimate	
-RULE_OF_LAW <- wb(indicator = "RL.EST", startdate = 2009, enddate = 2010)
+RULE_OF_LAW <- wb(indicator = "RL.EST", startdate = 2010, enddate = 2012)
 
 #NUTRITION
 #Prevalence Of Undernourishment (% Of Population)
-UNDERNOURISHMENT <- wb(indicator = "SN.ITK.DEFC.ZS", startdate = 2009, enddate = 2010)
+UNDERNOURISHMENT <- wb(indicator = "SN.ITK.DEFC.ZS", startdate = 2010, enddate = 2012)
 
 #HEALTH
 #Physicians (per 1,000 people)
-DOCTORS <- wb(indicator = "SH.MED.PHYS.ZS", startdate = 2009, enddate = 2010)
+DOCTORS <- wb(indicator = "SH.MED.PHYS.ZS", startdate = 2010, enddate = 2012)
 #Births attended by skilled health staff (% of total)	
-DELIVERY_ASSISTANCE <- wb(indicator = "SH.STA.BRTC.ZS", startdate = 2009, enddate = 2010)
+DELIVERY_ASSISTANCE <- wb(indicator = "SH.STA.BRTC.ZS", startdate = 2010, enddate = 2012)
 #Prevalence of HIV, total (% of population ages 15-49)
-AIDS_PREVALENCE <- wb(indicator = "SH.DYN.AIDS.ZS", startdate = 2009, enddate = 2010)
+AIDS_PREVALENCE <- wb(indicator = "SH.DYN.AIDS.ZS", startdate = 2010, enddate = 2012)
 #Incidence of malaria (per 1,000 population at risk)	
-MALARIA_INCIDENCE <- wb(indicator = "SH.MLR.INCD.P3", startdate = 2009, enddate = 2010)
+MALARIA_INCIDENCE <- wb(indicator = "SH.MLR.INCD.P3", startdate = 2010, enddate = 2012)
 #Immunization, DPT (% of children ages 12-23 months)
-DPT <- wb(indicator = "SH.IMM.IDPT", startdate = 2009, enddate = 2010)
+DPT <- wb(indicator = "SH.IMM.IDPT", startdate = 2010, enddate = 2012)
 #Hospital beds (per 1,000 people)
-HOSPITAL_BEDS <- wb(indicator = "SH.MED.BEDS.ZS", startdate = 2009, enddate = 2010)
+HOSPITAL_BEDS <- wb(indicator = "SH.MED.BEDS.ZS", startdate = 2010, enddate = 2012)
 
 #ENGERGY
 #Access to electricity (% of total population)
-ELECTRICITY <- wb(indicator = "1.1_ACCESS.ELECTRICITY.TOT", startdate = 2009, enddate = 2010)
+ELECTRICITY <- wb(indicator = "1.1_ACCESS.ELECTRICITY.TOT", startdate = 2010, enddate = 2012)
 
 #DEMOGRAPHY
 #Urban population (% of total)
-URBAN_RATE <- wb(indicator = "SP.URB.TOTL.IN.ZS", startdate = 2009, enddate = 2010)
+URBAN_RATE <- wb(indicator = "SP.URB.TOTL.IN.ZS", startdate = 2010, enddate = 2012)
 #Surface area (sq. km)
-SURFACE <- wb(indicator = "AG.SRF.TOTL.K2", startdate = 2009, enddate = 2010)
+SURFACE <- wb(indicator = "AG.SRF.TOTL.K2", startdate = 2010, enddate = 2012)
+
 
 #Economic development data
 #https://datahelpdesk.worldbank.org/knowledgebase/articles/378834-how-does-the-world-bank-classify-countries
@@ -152,8 +152,8 @@ income_class <- read_csv("bases/WB/income_class_serie.csv")
 #Variable construction
 #########################################################################
 #Mortality rates
-population <- rbind(population_05_09, population_10_14, population_15_17)
-population <- subset(population, population$year_id %in% c(2009:2017))
+population <- rbind(population_10_14, population_15_17)
+population <- subset(population, population$year_id %in% c(2010:2017))
 population <- subset(population, population$location_id != "533")#Excluding Georigia-US
 population <- dplyr::select(population, c('location_name','sex_name','age_group_name', 'year_id', 'val'))
 population <- subset(population,population$sex_name == "Both")
@@ -170,7 +170,7 @@ number_deaths_neo <- subset(number_deaths, number_deaths$age %in% c("Early Neona
 number_deaths_neo <- number_deaths_neo %>%
                         group_by(location, year) %>%
                         dplyr::summarize(deaths_neo = sum(val))
- 
+
 number_deaths_under_5 <- number_deaths %>%
                         group_by(location, year) %>%
                         dplyr::summarize(deaths_u5 = sum(val))
@@ -178,22 +178,20 @@ number_deaths <- merge(number_deaths_neo, number_deaths_under_5, by = c("locatio
 number_deaths$neo_u5 <- number_deaths$deaths_u5 - number_deaths$deaths_neo
 
 deaths <- merge(number_deaths, population_birth, by = c('location','year'))
-names(deaths) <- c('LOCATION', 'YEAR', 'DEATHS_NEO', 'DEATHS_U5', 'DEATHS_NEO_U5', 'BIRTHS')
+deaths$deaths_u5 <- NULL
+names(deaths) <- c('LOCATION', 'YEAR', 'DEATHS_NEO', 'DEATHS_NEO_U5', 'BIRTHS')
 deaths$RATE_NEO <- deaths$DEATHS_NEO/deaths$BIRTHS * 1000
-deaths$RATE_U5 <- deaths$DEATHS_U5/deaths$BIRTHS * 1000
 deaths$RATE_NEO_U5 <- deaths$DEATHS_NEO_U5/deaths$BIRTHS * 1000
-deaths_2017 <- subset(deaths[,c(1,7,8,9)], deaths$YEAR == 2017)
-names(deaths_2017)[2] <- "RATE_NEO_2017"
-names(deaths_2017)[3] <- "RATE_U5_2017"
-names(deaths_2017)[4] <- "RATE_NEO_U5_2017"
-deaths_2016 <- subset(deaths[,c(1,7,8,9)], deaths$YEAR == 2016)
-names(deaths_2016)[2] <- "RATE_NEO_2016"
-names(deaths_2016)[3] <- "RATE_U5_2016"
-names(deaths_2016)[4] <- "RATE_NEO_U5_2016"
-deaths <- merge(deaths_2017, deaths_2016, by = "LOCATION")
-deaths$DELTA_RATE_NEO <- deaths$RATE_NEO_2017 - deaths$RATE_NEO_2016
-deaths$DELTA_RATE_U5 <- deaths$RATE_U5_2017 - deaths$RATE_U5_2016
-deaths$DELTA_RATE_NEO_U5 <- deaths$RATE_NEO_U5_2017 - deaths$RATE_NEO_U5_2016
+deaths$RATE_NEO <- 1000 - deaths$RATE_NEO #Converting to number of survivals
+deaths$RATE_NEO_U5 <- 1000 - deaths$RATE_NEO_U5 #Converting to number of survivals
+
+deaths <- subset(deaths[,-c(3,4,5)], deaths$YEAR %in% c(2016,2017))
+deaths <- deaths %>%
+   group_by(LOCATION) %>%
+   summarize(MEAN_RATE_NEO = mean(RATE_NEO, na.rm = T),
+      MEAN_RATE_NEO_U5 = mean(RATE_NEO_U5, na.rm = T))
+
+
 
 #Fertility rate
 fertility <- do.call(rbind,fertility)
@@ -204,13 +202,13 @@ fertility$Total <- as.numeric(fertility$Total)
 fertility$LOCATION <- gsub(", Fertility", "",fertility$LOCATION)
 names(fertility) <- c('YEAR', 'FERTILITY_RATE','LOCATION')
 
-fertility <- subset(fertility, fertility$YEAR %in% c(2011:2012))
+fertility <- subset(fertility, fertility$YEAR %in% c(2010:2012))
 fertility <- fertility %>%
    group_by(LOCATION) %>%
    summarize(FERTILITY_RATE_LAGGED = mean(FERTILITY_RATE, na.rm = T))
 #65 years old + 
 population_65 <- subset(population,population$age %in% c("65 to 69", "70+ years", "All Ages"))
-population_65 <- subset(population_65, population_65$year %in% c(2011:2012))
+population_65 <- subset(population_65, population_65$year %in% c(2010:2012))
 population_65 <- dcast(population_65, location  ~ age, value.var = "val", fun.aggregate = mean)
 population_65$PLUS_65_YEARS_LAGGED <- (population_65$`65 to 69` + population_65$`70+ years`)/population_65$`All Ages`
 population_65$`65 to 69` <- NULL
@@ -249,7 +247,7 @@ who <- dcast(who, Countries + YEAR ~ Indicators, value.var = "value")
 who[is.na(who)] <- 0
 who$HEALTH_PPP <- who$EXT_PPP + who$DGGHE_PPP #Domestic and external health expenditure per capita PPP
 names(who)[1] <- "LOCATION" 
-who<- subset(who, who$YEAR %in% c(2009:2016))
+who<- subset(who, who$YEAR %in% c(2010:2016))
 #Adjusting countries names to merge with world bank data
 who[which(who$LOCATION == "Bahamas"), 1] <- "Bahamas, The"
 who[which(who$LOCATION == "Bolivia Plurinational States of"), 1] <- "Bolivia"
@@ -353,7 +351,7 @@ wb1 <- wb1 %>%
       )
 
 all_pop <- subset(population, population$age == "All Ages")
-all_pop <- subset(all_pop, all_pop$year == c(2009,2010))
+all_pop <- subset(all_pop, all_pop$year %in% c(2010:2012))
 all_pop <- all_pop %>%
    group_by(location) %>%
    summarise(pop = mean(val, na.rm = T))
@@ -385,7 +383,6 @@ all_pop[which(all_pop$LOCATION == "Brunei"), 1] <- "Brunei Darussalam"
 wb1 <- merge(wb1, all_pop, by = "LOCATION", all.x = T)
 
 wb1$POP_DENS <- wb1$pop/wb1$SURFACE #Populational density
-wb1$SURFACE <- NULL
 wb2 <- Reduce(function(x, y) merge(x, y, by = c("LOCATION", "YEAR"),  all=TRUE), 
       list(ODA, deflator, TAX))
 
@@ -418,14 +415,13 @@ for(i in seq_along(who_deflac$LOCATION)){
 }
 who <- unnest(who_deflac)
 
-#Calculating Proportion of Public Health Expenditure
-who$PROP_PUBLIC_HEALTH_EXP <- who$HEALTH_PPP/who$PUBLIC_EXP
-who <- dplyr::select(who, LOCATION, YEAR, GDP_PPP, PUBLIC_EXP, PROP_PUBLIC_HEALTH_EXP, OOP_PPP)
+who <- dplyr::select(who, LOCATION, YEAR, GDP_PPP, PUBLIC_EXP, HEALTH_PPP, OOP_PPP, TAX_PPP)
 #Excluding countries without information
 who <- na.omit(who)
 who <- subset(who, who$GDP_PPP != 0)
 who <- subset(who, who$PUBLIC_EXP != 0)
-who <- subset(who, who$PROP_PUBLIC_HEALTH_EXP != 0)
+who <- subset(who, who$HEALTH_PPP != 0)
+who <- subset(who, who$TAX_PPP != 0)
 
 #Estimanting lagged 
 who_lagged1 <- subset(who, who$YEAR %in% c(2015))
@@ -433,24 +429,25 @@ who_lagged1 <- who_lagged1 %>%
    group_by(LOCATION) %>%
    summarize(GDP_PPP_LAGGED1 = GDP_PPP)
 
+
+#Calculating Proportion of Public Health Expenditure
 who_lagged2 <- subset(who, who$YEAR %in% c(2013:2014))
-who_lagged2_PUBLIC_EXP <- who_lagged2[,c(1,2,4)]
-who_lagged2_PUBLIC_EXP <- dcast(who_lagged2_PUBLIC_EXP, LOCATION ~ YEAR, value.var = "PUBLIC_EXP")
-who_lagged2_PUBLIC_EXP$PUBLIC_EXP_LAGGED2 <- who_lagged2_PUBLIC_EXP$`2014` <- who_lagged2_PUBLIC_EXP$`2013` 
-who_lagged2 <- who_lagged2 %>% 
+who_lagged2$PROP_PUBLIC_HEALTH_EXP <- who_lagged2$HEALTH_PPP/who_lagged2$PUBLIC_EXP
+who_lagged2 <- who_lagged2 %>%
    group_by(LOCATION) %>%
-   summarize(PROP_PUBLIC_HEALTH_EXP_LAGGED2 = mean(PROP_PUBLIC_HEALTH_EXP, na.rm = T))
-who_lagged2 <- merge(who_lagged2, who_lagged2_PUBLIC_EXP[,c(1,4)], by = "LOCATION")
+   summarize(TAX_PPP_LAGGED2 = mean(TAX_PPP, na.rm = T),
+      PUBLIC_EXP_LAGGED2 = mean(PUBLIC_EXP, na.rm = T),
+      PROP_PUBLIC_HEALTH_EXP_LAGGED2 = mean(PROP_PUBLIC_HEALTH_EXP, na.rm = T))
 
 
-who_lagged4 <- subset(who, who$YEAR %in% c(2009:2010))
-who_lagged4 <- who_lagged4 %>% 
+who_lagged3 <- subset(who, who$YEAR %in% c(2010:2012))
+who_lagged3 <- who_lagged3 %>% 
    group_by(LOCATION) %>%
-   summarize(OOP_PPP_LAGGED4 = mean(OOP_PPP, na.rm = T))
+   summarize(OOP_PPP_LAGGED3 = mean(OOP_PPP, na.rm = T))
 
 
 who <- merge(who_lagged1, who_lagged2, by = "LOCATION")
-who <- merge(who, who_lagged4, by = "LOCATION")
+who <- merge(who, who_lagged3, by = "LOCATION")
 
 
 #Income class
@@ -500,7 +497,7 @@ base <- merge(base, wb1, by = "LOCATION", all.x = T)
 base <- merge(base, income_class, by = "LOCATION", all.x = T)
 base <- merge(base, coord_countries, by = "LOCATION", all.x = T)
 #Excludina countries without mortality and centroid data
-base <- base[which(!is.na(base$DELTA_RATE_NEO)), ]
+base <- base[which(!is.na(base$MEAN_RATE_NEO)), ]
 base <- base[which(!is.na(base$X)), ]
 names(base)[which(names(base) == "X")] <- "LONG" 
 names(base)[which(names(base) == "Y")] <- "LAT" 
@@ -517,8 +514,6 @@ completed_base <- cbind(dplyr::select(base, LOCATION, INCOME_CLASS), completed_b
 densityplot(temp_base)
 
 
-completed_base <- subset(completed_base, completed_base$DELTA_RATE_NEO < 0)
-completed_base <- subset(completed_base, completed_base$DELTA_RATE_NEO_U5 < 0)
 #########################################################################
 #Saving the databases
 #########################################################################

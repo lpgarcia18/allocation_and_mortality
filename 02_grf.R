@@ -68,7 +68,16 @@ lm(W~Z+X1)%>% summary()#First stage 2sls
 ivreg(Y_neo ~ W+X1 | X1 + Z) %>%
    summary(vcov = sandwich, diagnostics=TRUE)#2sls whith Wu-Hausman test
 
+##28d>5u
+X1 <- as.matrix(X[,c(1:32)])
+lm(Y_neo_u5 ~ W+X1) %>% summary()#Linear regression
+lm(W~Z+X1)%>% summary()#First stage 2sls
+ivreg(Y_neo_u5 ~ W+X1 | X1 + Z) %>%
+   summary(vcov = sandwich, diagnostics=TRUE)#2sls whith Wu-Hausman test
 
+
+##The Wu-Hausman test so we used causal_forest insted of instrumental_forest
+#Causal_forest
 Y_neo.forest <- regression_forest(X, Y_neo, seed = 233)
 Y_neo.hat <- predict(Y_neo.forest)$predictions
 Y_neo_u5.forest <- regression_forest(X, Y_neo_u5, seed = 233)
@@ -130,6 +139,10 @@ pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-1.96*(pred_neo_u5$SE)
 pred <- cbind(completed_base, pred_neo[,c(5,9,8)], pred_neo_u5[,c(5,9,8)])
 pred$IMPACT_NEO <- pred$PRED_NEO * pred$PUBLIC_EXP_LAGGED2 
 pred$IMPACT_NEO_U5 <- pred$PRED_NEO_U5 * pred$PUBLIC_EXP_LAGGED2
+
+average_partial_effect(cs_neo, subset = NULL)
+
+average_partial_effect(cs_neo_u5, subset = NULL)
 
 
 #########################################################################

@@ -60,23 +60,6 @@ W <- completed_base$PUBLIC_EXP_LAGGED2
 Z <- completed_base$TAX_PPP_LAGGED2
 
 
-#Analysing the endogeneity
-##Neonatal
-X1 <- as.matrix(X[,c(1:32)])
-lm(Y_neo ~ W+X1) %>% summary()#Linear regression
-lm(W~Z+X1)%>% summary()#First stage 2sls
-ivreg(Y_neo ~ W+X1 | X1 + Z) %>%
-   summary(vcov = sandwich, diagnostics=TRUE)#2sls whith Wu-Hausman test
-
-##28d>5u
-X1 <- as.matrix(X[,c(1:32)])
-lm(Y_neo_u5 ~ W+X1) %>% summary()#Linear regression
-lm(W~Z+X1)%>% summary()#First stage 2sls
-ivreg(Y_neo_u5 ~ W+X1 | X1 + Z) %>%
-   summary(vcov = sandwich, diagnostics=TRUE)#2sls whith Wu-Hausman test
-
-
-##The Wu-Hausman test so we used causal_forest insted of instrumental_forest
 #Causal_forest
 Y_neo.forest <- regression_forest(X, Y_neo, seed = 233)
 Y_neo.hat <- predict(Y_neo.forest)$predictions
@@ -84,10 +67,12 @@ Y_neo_u5.forest <- regression_forest(X, Y_neo_u5, seed = 233)
 Y_neo_u5.hat <- predict(Y_neo_u5.forest)$predictions
 W.forest <- regression_forest (X , W, seed = 233)
 W.hat <- predict(W.forest)$predictions
+clust <- as.numeric(as.factor(completed_base$INCOME_CLASS))
 
 #Effect neo
 cs_neo_raw <- causal_forest(X, Y_neo, W, 
-                    Y_neo.hat, W.hat, 
+                    Y_neo.hat, W.hat,
+                    clusters = clust,
                     tune.parameters = T,
                     honesty = T,
                     num.trees = 500000,   
@@ -97,6 +82,7 @@ varimp_neo <- variable_importance(cs_neo_raw)
 selected_idx_neo <- which(varimp_neo > mean(varimp_neo))
 cs_neo <- causal_forest(X[,selected_idx_neo], Y_neo, W, 
                     Y_neo.hat, W.hat, 
+                    clusters = clust,
                     tune.parameters = T,
                     honesty = T,
                     num.trees = 500000, 
@@ -104,13 +90,14 @@ cs_neo <- causal_forest(X[,selected_idx_neo], Y_neo, W,
                     seed = 233)
 pred_neo <- predict(cs_neo, newdata = NULL, estimate.variance = TRUE, set.seed(233))
 pred_neo$PRED_NEO <- pred_neo$predictions 
-pred_neo$IC_95_NEO <- pred_neo$predictions+1.96*sqrt(pred_neo$variance.estimates)
-pred_neo$IC_05_NEO <- pred_neo$predictions-1.96*sqrt(pred_neo$variance.estimates)
+pred_neo$IC_95_NEO <- pred_neo$predictions+(1.96*(sqrt(pred_neo$variance.estimates)/sqrt(500000)))
+pred_neo$IC_05_NEO <- pred_neo$predictions-(1.96*(sqrt(pred_neo$variance.estimates)/sqrt(500000)))
 
 
 #Effect neo_u5
 cs_neo_u5_raw <- causal_forest(X, Y_neo_u5, W, 
                     Y_neo_u5.hat, W.hat, 
+                    clusters = clust,
                     tune.parameters = T,
                     honesty = T,
                     num.trees = 500000, 
@@ -120,6 +107,7 @@ varimp_neo_u5 <- variable_importance(cs_neo_u5_raw)
 selected_idx_neo_u5 <- which(varimp_neo_u5 > mean(varimp_neo_u5))
 cs_neo_u5 <- causal_forest(X[,selected_idx_neo_u5], Y_neo_u5, W, 
                     Y_neo_u5.hat, W.hat,
+                    clusters = clust,
                     tune.parameters = T,
                     honesty = T,
                     num.trees = 500000, 
@@ -127,23 +115,23 @@ cs_neo_u5 <- causal_forest(X[,selected_idx_neo_u5], Y_neo_u5, W,
                     seed = 233)
 pred_neo_u5 <- predict(cs_neo_u5, newdata = NULL, estimate.variance = TRUE, set.seed(233))
 pred_neo_u5$PRED_NEO_U5 <- pred_neo_u5$predictions 
-pred_neo_u5$IC_95_NEO_U5 <- pred_neo_u5$predictions+1.96*sqrt(pred_neo_u5$variance.estimates)
-pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-1.96*sqrt(pred_neo_u5$variance.estimates)
+pred_neo_u5$IC_95_NEO_U5 <- pred_neo_u5$predictions+(1.96*(sqrt(pred_neo_u5$variance.estimates)/sqrt(500000)))
+pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-(1.96*(sqrt(pred_neo_u5$variance.estimates)/sqrt(500000)))
 
-
+#Ver os intervalos de confiança
 
 pred <- cbind(completed_base, pred_neo[,c(5,7,6)], pred_neo_u5[,c(5,7,6)])
-pred$IMPACT_NEO <- pred$PRED_NEO * pred$PUBLIC_EXP_LAGGED2 
-pred$IMPACT_NEO_U5 <- pred$PRED_NEO_U5 * pred$PUBLIC_EXP_LAGGED2
+pred$IMPACT_NEO <- pred$PRED_NEO *-1
+pred$IMPACT_NEO_U5 <- pred$PRED_NEO_U5 *-1  
 
 ape_neo <- average_partial_effect(cs_neo, subset = NULL)
-ape_neo_ci05 <- as.numeric(ape_neo[1]) + 1.96 * sqrt(as.numeric(ape_neo[2]))
-ape_neo_ci95 <- as.numeric(ape_neo[1]) - 1.96 * sqrt(as.numeric(ape_neo[2]))
+ape_neo_ci95 <- as.numeric(ape_neo[1]) + 1.96 * sqrt(as.numeric(ape_neo[2]))
+ape_neo_ci05 <- as.numeric(ape_neo[1]) - 1.96 * sqrt(as.numeric(ape_neo[2]))
 
 average_partial_effect(cs_neo_u5, subset = NULL)
-ape_neo_u5 <- average_partial_effect(cs_neo, subset = NULL)
-ape_neo_u5_ci05 <- as.numeric(ape_neo_u5[1]) + 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
-ape_neo_u5_ci95 <- as.numeric(ape_neo_u5[1]) - 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
+ape_neo_u5 <- average_partial_effect(cs_neo_u5, subset = NULL)
+ape_neo_u5_ci95 <- as.numeric(ape_neo_u5[1]) + 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
+ape_neo_u5_ci05 <- as.numeric(ape_neo_u5[1]) - 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
 
 
 

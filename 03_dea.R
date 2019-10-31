@@ -28,8 +28,12 @@ pred <- read_csv("bases/impact_predictions.csv")
 #########################################################################
 pred$HEALTH <- pred$PUBLIC_EXP_LAGGED2 * pred$PROP_PUBLIC_HEALTH_EXP_LAGGED2
 pred$NON_HEALTH <- pred$PUBLIC_EXP_LAGGED2 -  pred$HEALTH
+#Mantaining only treatments with 0.05 of signf.
+pred_cut <- subset(pred, pred$IC_95_NEO_U5 > 0)
+pred_cut <- subset(pred_cut, pred$IC_95_NEO > 0)
 
-base_dea <- pred
+
+base_dea <- pred_cut
 
 variaveis <- c("LOCATION", "INCOME_CLASS", "IMPACT_NEO", 
                "IMPACT_NEO_U5", "HEALTH", "NON_HEALTH") 

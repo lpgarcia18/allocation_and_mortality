@@ -182,8 +182,8 @@ deaths$deaths_u5 <- NULL
 names(deaths) <- c('LOCATION', 'YEAR', 'DEATHS_NEO', 'DEATHS_NEO_U5', 'BIRTHS')
 deaths$RATE_NEO <- deaths$DEATHS_NEO/deaths$BIRTHS * 1000
 deaths$RATE_NEO_U5 <- deaths$DEATHS_NEO_U5/deaths$BIRTHS * 1000
-deaths$RATE_NEO <- 1000 - deaths$RATE_NEO #Converting to number of survivals
-deaths$RATE_NEO_U5 <- 1000 - deaths$RATE_NEO_U5 #Converting to number of survivals
+deaths$RATE_NEO <- deaths$RATE_NEO 
+deaths$RATE_NEO_U5 <- deaths$RATE_NEO_U5 
 
 deaths <- subset(deaths[,-c(3,4,5)], deaths$YEAR %in% c(2016,2017))
 deaths <- deaths %>%

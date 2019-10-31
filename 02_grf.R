@@ -88,61 +88,63 @@ W.hat <- predict(W.forest)$predictions
 #Effect neo
 cs_neo_raw <- causal_forest(X, Y_neo, W, 
                     Y_neo.hat, W.hat, 
-                    mtry = sqrt(ncol(X)),
-                    num.trees = 500000,
+                    tune.parameters = T,
                     honesty = T,
+                    num.trees = 500000,   
                     compute.oob.predictions = TRUE,
                     seed = 233)
 varimp_neo <- variable_importance(cs_neo_raw)
 selected_idx_neo <- which(varimp_neo > mean(varimp_neo))
 cs_neo <- causal_forest(X[,selected_idx_neo], Y_neo, W, 
                     Y_neo.hat, W.hat, 
-                    mtry = sqrt(ncol(X)),
-                    num.trees = 500000,
+                    tune.parameters = T,
                     honesty = T,
+                    num.trees = 500000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 pred_neo <- predict(cs_neo, newdata = NULL, estimate.variance = TRUE, set.seed(233))
 pred_neo$PRED_NEO <- pred_neo$predictions 
-pred_neo$DESV_PADR_NEO <- sqrt(pred_neo$variance.estimates)
-pred_neo$SE_NEO <- pred_neo$DESV_PADR/sqrt(500000)
-pred_neo$IC_95_NEO <- pred_neo$predictions+1.96*(pred_neo$SE)
-pred_neo$IC_05_NEO <- pred_neo$predictions-1.96*(pred_neo$SE)
+pred_neo$IC_95_NEO <- pred_neo$predictions+1.96*sqrt(pred_neo$variance.estimates)
+pred_neo$IC_05_NEO <- pred_neo$predictions-1.96*sqrt(pred_neo$variance.estimates)
 
 
 #Effect neo_u5
 cs_neo_u5_raw <- causal_forest(X, Y_neo_u5, W, 
                     Y_neo_u5.hat, W.hat, 
-                    mtry = sqrt(ncol(X)),
-                    num.trees = 500000,
+                    tune.parameters = T,
                     honesty = T,
+                    num.trees = 500000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 varimp_neo_u5 <- variable_importance(cs_neo_u5_raw)
 selected_idx_neo_u5 <- which(varimp_neo_u5 > mean(varimp_neo_u5))
 cs_neo_u5 <- causal_forest(X[,selected_idx_neo_u5], Y_neo_u5, W, 
-                    Y_neo_u5.hat, W.hat, 
-                    mtry = sqrt(ncol(X)),
-                    num.trees = 500000,
+                    Y_neo_u5.hat, W.hat,
+                    tune.parameters = T,
                     honesty = T,
+                    num.trees = 500000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 pred_neo_u5 <- predict(cs_neo_u5, newdata = NULL, estimate.variance = TRUE, set.seed(233))
 pred_neo_u5$PRED_NEO_U5 <- pred_neo_u5$predictions 
-pred_neo_u5$DESV_PADR_NEO_U5 <- sqrt(pred_neo_u5$variance.estimates)
-pred_neo_u5$SE_NEO_U5 <- pred_neo_u5$DESV_PADR/sqrt(500000)
-pred_neo_u5$IC_95_NEO_U5 <- pred_neo_u5$predictions+1.96*(pred_neo_u5$SE)
-pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-1.96*(pred_neo_u5$SE)
+pred_neo_u5$IC_95_NEO_U5 <- pred_neo_u5$predictions+1.96*sqrt(pred_neo_u5$variance.estimates)
+pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-1.96*sqrt(pred_neo_u5$variance.estimates)
 
 
 
-pred <- cbind(completed_base, pred_neo[,c(5,9,8)], pred_neo_u5[,c(5,9,8)])
+pred <- cbind(completed_base, pred_neo[,c(5,7,6)], pred_neo_u5[,c(5,7,6)])
 pred$IMPACT_NEO <- pred$PRED_NEO * pred$PUBLIC_EXP_LAGGED2 
 pred$IMPACT_NEO_U5 <- pred$PRED_NEO_U5 * pred$PUBLIC_EXP_LAGGED2
 
-average_partial_effect(cs_neo, subset = NULL)
+ape_neo <- average_partial_effect(cs_neo, subset = NULL)
+ape_neo_ci05 <- as.numeric(ape_neo[1]) + 1.96 * sqrt(as.numeric(ape_neo[2]))
+ape_neo_ci95 <- as.numeric(ape_neo[1]) - 1.96 * sqrt(as.numeric(ape_neo[2]))
 
 average_partial_effect(cs_neo_u5, subset = NULL)
+ape_neo_u5 <- average_partial_effect(cs_neo, subset = NULL)
+ape_neo_u5_ci05 <- as.numeric(ape_neo_u5[1]) + 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
+ape_neo_u5_ci95 <- as.numeric(ape_neo_u5[1]) - 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
+
 
 
 #########################################################################

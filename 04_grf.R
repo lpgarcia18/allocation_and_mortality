@@ -33,7 +33,7 @@ names(completed_base)[1] <- "LOCATION"
 #########################################################################
 # Impact on Neontatal Mortality -------------------------------------------
 
-demography <- c("FERTILITY_RATE_LAGGED","URBAN_RATE_LAGGED", "POP_DENS", "PLUS_65_YEARS_LAGGED")
+demography <- c("FERTILITY_RATE_LAGGED","URBAN_RATE_LAGGED", "POP_DENS", "PLUS_65_YEARS_LAGGED", "pop")
 geography <- c("LONG", "LAT")
 women_empowerment <- c("UNEMPLOYMENT_FEM_LAGGED", "SCHOOL_FEM_LAGGED",            
 "WOMEN_PARLIAMENT_LAGGED")
@@ -57,7 +57,6 @@ Y_neo <- completed_base$MEAN_RATE_NEO
 Y_neo_u5 <- completed_base$MEAN_RATE_NEO_U5
 X <- dplyr::select(completed_base, external_factors)
 W <- completed_base$PUBLIC_EXP_LAGGED2
-Z <- completed_base$TAX_PPP_LAGGED2
 
 
 #Causal_forest
@@ -75,7 +74,7 @@ cs_neo_raw <- causal_forest(X, Y_neo, W,
                     clusters = clust,
                     tune.parameters = T,
                     honesty = T,
-                    num.trees = 500000,   
+                    num.trees = 150000,   
                     compute.oob.predictions = TRUE,
                     seed = 233)
 varimp_neo <- variable_importance(cs_neo_raw)
@@ -85,13 +84,13 @@ cs_neo <- causal_forest(X[,selected_idx_neo], Y_neo, W,
                     clusters = clust,
                     tune.parameters = T,
                     honesty = T,
-                    num.trees = 500000, 
+                    num.trees = 150000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 pred_neo <- predict(cs_neo, newdata = NULL, estimate.variance = TRUE, set.seed(233))
 pred_neo$PRED_NEO <- pred_neo$predictions 
-pred_neo$IC_95_NEO <- pred_neo$predictions+(1.96*(sqrt(pred_neo$variance.estimates)/sqrt(500000)))
-pred_neo$IC_05_NEO <- pred_neo$predictions-(1.96*(sqrt(pred_neo$variance.estimates)/sqrt(500000)))
+pred_neo$IC_95_NEO <- pred_neo$predictions+(1.96*(sqrt(pred_neo$variance.estimates))) #"The square-root of column ’variance.estimates’ is the standard error of CATE" - https://cran.r-project.org/web/packages/grf/grf.pdf
+pred_neo$IC_05_NEO <- pred_neo$predictions-(1.96*(sqrt(pred_neo$variance.estimates))) #"The square-root of column ’variance.estimates’ is the standard error of CATE" - https://cran.r-project.org/web/packages/grf/grf.pdf
 
 
 #Effect neo_u5
@@ -100,7 +99,7 @@ cs_neo_u5_raw <- causal_forest(X, Y_neo_u5, W,
                     clusters = clust,
                     tune.parameters = T,
                     honesty = T,
-                    num.trees = 500000, 
+                    num.trees = 150000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 varimp_neo_u5 <- variable_importance(cs_neo_u5_raw)
@@ -110,15 +109,13 @@ cs_neo_u5 <- causal_forest(X[,selected_idx_neo_u5], Y_neo_u5, W,
                     clusters = clust,
                     tune.parameters = T,
                     honesty = T,
-                    num.trees = 500000, 
+                    num.trees = 150000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 pred_neo_u5 <- predict(cs_neo_u5, newdata = NULL, estimate.variance = TRUE, set.seed(233))
 pred_neo_u5$PRED_NEO_U5 <- pred_neo_u5$predictions 
-pred_neo_u5$IC_95_NEO_U5 <- pred_neo_u5$predictions+(1.96*(sqrt(pred_neo_u5$variance.estimates)/sqrt(500000)))
-pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-(1.96*(sqrt(pred_neo_u5$variance.estimates)/sqrt(500000)))
-
-#Ver os intervalos de confiança
+pred_neo_u5$IC_95_NEO_U5 <- pred_neo_u5$predictions+(1.96*(sqrt(pred_neo_u5$variance.estimates)))#"The square-root of column ’variance.estimates’ is the standard error of CATE" - https://cran.r-project.org/web/packages/grf/grf.pdf
+pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-(1.96*(sqrt(pred_neo_u5$variance.estimates)))#"The square-root of column ’variance.estimates’ is the standard error of CATE" - https://cran.r-project.org/web/packages/grf/grf.pdf
 
 pred <- cbind(completed_base, pred_neo[,c(5,7,6)], pred_neo_u5[,c(5,7,6)])
 pred$IMPACT_NEO <- pred$PRED_NEO *-1
@@ -128,7 +125,6 @@ ape_neo <- average_partial_effect(cs_neo, subset = NULL)
 ape_neo_ci95 <- as.numeric(ape_neo[1]) + 1.96 * sqrt(as.numeric(ape_neo[2]))
 ape_neo_ci05 <- as.numeric(ape_neo[1]) - 1.96 * sqrt(as.numeric(ape_neo[2]))
 
-average_partial_effect(cs_neo_u5, subset = NULL)
 ape_neo_u5 <- average_partial_effect(cs_neo_u5, subset = NULL)
 ape_neo_u5_ci95 <- as.numeric(ape_neo_u5[1]) + 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
 ape_neo_u5_ci05 <- as.numeric(ape_neo_u5[1]) - 1.96 * sqrt(as.numeric(ape_neo_u5[2]))

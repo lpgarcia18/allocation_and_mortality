@@ -37,7 +37,6 @@ library(reshape2)
 
 ```{r include=FALSE}
 #Databases
-pred <- read_csv("bases/impact_predictions.csv")
 base_efi <- read_csv("bases/efficiency_analysis.csv")
 ```
 
@@ -48,42 +47,6 @@ base_efi <- read_csv("bases/efficiency_analysis.csv")
 WorldData <- map_data('world')
 WorldData %>% filter(region != "Antarctica") -> WorldData
 WorldData <- fortify(WorldData)
-
-
-
-#Adjustin countries names
-pred$region_map <- pred$LOCATION
-pred[which(pred$LOCATION == "Congo, Rep."), 50] <- "Republic of Congo"
-pred[which(pred$LOCATION == "Egypt, Arab Rep."), 50] <- "Egypt"
-pred[which(pred$LOCATION == "Korea, Rep."), 50] <- "South Korea"
-pred[which(pred$LOCATION == "North Macedonia"), 50] <- "Macedonia"
-pred[which(pred$LOCATION == "Russian Federation"), 50] <- "Russia"
-pred[which(pred$LOCATION == "Trinidad and Tobago"), 50] <- "Trinidad"
-pred[which(pred$LOCATION == "United Kingdom"), 50] <- "UK"
-pred[which(pred$LOCATION == "United States"), 50] <- "USA"
-pred[which(pred$LOCATION == "Brunei Darussalam"), 50] <- "Brunei"
-pred[which(pred$LOCATION == "Congo, Dem. Rep."), 50] <- "Democratic Republic of the Congo"
-pred[which(pred$LOCATION == "Gambia, The"), 50] <- "Gambia"
-pred[which(pred$LOCATION == "Cote d'Ivoire"), 50] <- "Ivory Coast"
-pred[which(pred$LOCATION == "Iran, Islamic Rep."), 50] <- "Iran"
-pred[which(pred$LOCATION == "Kyrgyz Republic"), 50] <- "Kyrgyzstan"
-pred[which(pred$LOCATION == "Lao PDR"), 50] <- "Laos"
-pred[which(pred$LOCATION == "Slovak Republic"), 50] <- "Slovakia"
-pred[which(pred$LOCATION == "Yemen, Rep."), 50] <- "Yemen"
-
-
-
-# teste <- WorldData[,c(3,5)]
-# teste$BASE <- "word"
-# teste <- unique(teste[,c(2,3)])
-# names(teste)[1] <- "region_map"
-# pred_t <- pred[,c(2,52)]
-# pred_t$BASE <- "pred"
-# pred_t$INCOME_CLASS <- NULL
-# teste <- merge(teste, pred_t, by = "region_map", all = T)
-
-pred_map <- pred
-pred_map <- merge(pred_map, WorldData, by.x = "region_map", by.y = "region", all.x = T)
 
 
 base_efi$region_map <- base_efi$LOCATION
@@ -112,123 +75,143 @@ base_map <- merge(base_map, WorldData, by.x = "region_map", by.y = "region", all
 ```
 Ao todo, foram utilizadas informações de 143 países, sendo 70 pobres e 73 não pobres. Os indicadores destes países antes e após a imputação estão exibidos nos Anexo 1 e 2.
 Entre os países pobres, todos apresentaram redução na taxa de mortalidade neonatal e na taxa de mortalidade de crianças com idade de 28dias a 5 anos, entre 2016 e 2017. O país pobre com a maior redução na taxa de mortalidade neonatal  foi `r base_efi[which(base_efi$MEAN_RATE_NEO == min(base_efi$MEAN_RATE_NEO)),1]`, com uma variação de `r round(base_efi[which(base_efi$MEAN_RATE_NEO == min(base_efi$MEAN_RATE_NEO)),9],3)`. O país com a menor redução foi `r base_efi[which(base_efi$MEAN_RATE_NEO == max(base_efi$MEAN_RATE_NEO)),1]`, apresentando uma redução de `r round(base_efi[which(base_efi$MEAN_RATE_NEO == max(base_efi$MEAN_RATE_NEO)),9],3)`. Com relação à taxa de mortalidade de crianças com idade entre 28 dias e 5 anos, o pais com a maior redução foi `r base_efi[which(base_efi$MEAN_RATE_NEO_U5 == min(base_efi$MEAN_RATE_NEO_U5)),1]` e com o com a menor `r base_efi[which(base_efi$MEAN_RATE_NEO_U5 == max(base_efi$MEAN_RATE_NEO_U5)),1]`, com variações de `r round(base_efi[which(base_efi$MEAN_RATE_NEO_U5 == min(base_efi$MEAN_RATE_NEO_U5)),11],3)` e `r round(base_efi[which(base_efi$MEAN_RATE_NEO_U5 == max(base_efi$MEAN_RATE_NEO_U5)),11],3)`, respectivamente.
-Com relação à variação da entre os gastos públicos (tratamento), todos os países pobres apresentaram aumento entre 2013 e 2014. O país com a maior variação foi `r base_efi[which(base_efi$PUBLIC_EXP_LAGGED2 == max(base_efi$PUBLIC_EXP_LAGGED2)),1]`, US\$`r round(base_efi[which(base_efi$PUBLIC_EXP_LAGGED2 == max(base_efi$PUBLIC_EXP_LAGGED2)),16],2)`; o com amenor foi `r base_efi[which(base_efi$PUBLIC_EXP_LAGGED2 == min(base_efi$PUBLIC_EXP_LAGGED2)),1]`: US\$`r round(base_efi[which(base_efi$PUBLIC_EXP_LAGGED2 == min(base_efi$PUBLIC_EXP_LAGGED2)),16],2)`. A média dos anos de 2011 e 2012 da proporção de pessoas com 65 anos ou mais (variável instrumental) foi maior em  `r base_efi[which(base_efi$PLUS_65_YEARS_LAGGED == max(base_efi$PLUS_65_YEARS_LAGGED)),1]`, `r round(base_efi[which(base_efi$PLUS_65_YEARS_LAGGED == max(base_efi$PLUS_65_YEARS_LAGGED)),17],2)`; e  menor em  `r base_efi[which(base_efi$PLUS_65_YEARS_LAGGED == min(base_efi$PLUS_65_YEARS_LAGGED)),1]`, `r round(base_efi[which(base_efi$PLUS_65_YEARS_LAGGED == min(base_efi$PLUS_65_YEARS_LAGGED)),17],2)`. (Figura 1)
+Com relação à variação da entre os gastos públicos (tratamento), todos os países pobres apresentaram aumento entre 2013 e 2014. O país com a maior variação foi `r base_efi[which(base_efi$PUBLIC_EXP_LAGGED2 == max(base_efi$PUBLIC_EXP_LAGGED2)),1]`, US\$`r round(base_efi[which(base_efi$PUBLIC_EXP_LAGGED2 == max(base_efi$PUBLIC_EXP_LAGGED2)),16],2)`; o com amenor foi `r base_efi[which(base_efi$PUBLIC_EXP_LAGGED2 == min(base_efi$PUBLIC_EXP_LAGGED2)),1]`: US\$`r round(base_efi[which(base_efi$PUBLIC_EXP_LAGGED2 == min(base_efi$PUBLIC_EXP_LAGGED2)),16],2)`. A proporção dos gastos públicos destinados à saúde foi maior em  `r base_efi[which(base_efi$PROP_PUBLIC_HEALTH_EXP_LAGGED2 == max(base_efi$PROP_PUBLIC_HEALTH_EXP_LAGGED2)),1]`, `r round(base_efi[which(base_efi$PROP_PUBLIC_HEALTH_EXP_LAGGED2 == max(base_efi$PROP_PUBLIC_HEALTH_EXP_LAGGED2)),17],2)`; e  menor em  `r base_efi[which(base_efi$PROP_PUBLIC_HEALTH_EXP_LAGGED2 == min(base_efi$PROP_PUBLIC_HEALTH_EXP_LAGGED2)),1]`, `r round(base_efi[which(base_efi$PROP_PUBLIC_HEALTH_EXP_LAGGED2 == min(base_efi$PROP_PUBLIC_HEALTH_EXP_LAGGED2)),17],2)`. (Figura 1)
 
 ```{r fig.width=18, fig.height=18}
 #Neontal, 28d<U5, Tax, Public Expenditure distribution
 myPalette_rev <- colorRampPalette(brewer.pal(11, "Spectral")) #Increasing
 myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))  #Decreasing
 
-pred_mapa_neo <- dplyr::select(pred_map, c(region_map, MEAN_RATE_NEO))
+base_mapa_neo <- dplyr::select(base_map, c(region_map, MEAN_RATE_NEO))
 plot1 <- ggplot()+
         geom_map(data=WorldData, map=WorldData,
                   aes(x=long, y=lat, group=group, map_id=region),
                   fill="white", colour="#7f7f7f", size=0.5)+
-        geom_map(data=pred_mapa_neo, map=WorldData,
+        geom_map(data=base_mapa_neo, map=WorldData,
                   aes(fill= MEAN_RATE_NEO, map_id=region_map),
                   colour="#7f7f7f", size=0.5)+
         coord_map("rectangular", lat0=0, xlim=c(-190,190), ylim=c(-60, 90))+
-        labs(fill="Var neo 2016-2017", x="", y="")+
+        labs(fill="Mean neo 2016-2017", x="", y="")+
         theme_bw()+
         theme(panel.border = element_blank())+
-        scale_fill_gradientn(colours = myPalette_rev(100), 
-                             labels = round(quantile(pred$MEAN_RATE_NEO, c(.05,.95)),3), 
-                             breaks = round(quantile(pred$MEAN_RATE_NEO, c(.05,.95)),3))
+        scale_fill_gradientn(colours = myPalette(20), 
+                             labels = round(quantile(base_mapa_neo$MEAN_RATE_NEO, c(.01,.99)),3), 
+                             breaks = round(quantile(base_mapa_neo$MEAN_RATE_NEO, c(.01,.99)),3))
 
-pred_mapa_neo_u5 <- dplyr::select(pred_map, c(region_map, MEAN_RATE_NEO_U5))
+base_mapa_neo_u5 <- dplyr::select(base_map, c(region_map, MEAN_RATE_NEO_U5))
 plot2 <- ggplot()+
         geom_map(data=WorldData, map=WorldData,
                   aes(x=long, y=lat, group=group, map_id=region),
                   fill="white", colour="#7f7f7f", size=0.5)+
-        geom_map(data=pred_mapa_neo_u5, map=WorldData,
+        geom_map(data=base_mapa_neo_u5, map=WorldData,
                   aes(fill= MEAN_RATE_NEO_U5, map_id=region_map),
                   colour="#7f7f7f", size=0.5)+
         coord_map("rectangular", lat0=0, xlim=c(-190,190), ylim=c(-60, 90))+
-        labs(fill="Var 28d<5y 2016-2017", x="", y="")+
+        labs(fill="Mean 28d<5y 2016-2017", x="", y="")+
         theme_bw()+
         theme(panel.border = element_blank())+
-        scale_fill_gradientn(colours = myPalette_rev(100), 
-                             labels = round(quantile(pred$MEAN_RATE_NEO_U5, c(.05,.95)),3), 
-                             breaks = round(quantile(pred$MEAN_RATE_NEO_U5, c(.05,.95)),3))
+        scale_fill_gradientn(colours = myPalette(20), 
+                             labels = round(quantile(base_mapa_neo_u5$MEAN_RATE_NEO_U5, c(.01,.99)),3), 
+                             breaks = round(quantile(base_mapa_neo_u5$MEAN_RATE_NEO_U5, c(.01,.99)),3))
 
-pred_mapa_public <- dplyr::select(pred_map, c(region_map, PUBLIC_EXP_LAGGED2))
+base_mapa_public <- dplyr::select(base_map, c(region_map, PUBLIC_EXP_LAGGED2))
 plot3 <- ggplot()+
         geom_map(data=WorldData, map=WorldData,
                   aes(x=long, y=lat, group=group, map_id=region),
                   fill="white", colour="#7f7f7f", size=0.5)+
-        geom_map(data=pred_mapa_public, map=WorldData,
+        geom_map(data=base_mapa_public, map=WorldData,
                   aes(fill= PUBLIC_EXP_LAGGED2, map_id=region_map),
                   colour="#7f7f7f", size=0.5)+
         coord_map("rectangular", lat0=0, xlim=c(-190,190), ylim=c(-60, 90))+
-        labs(fill="Var pub exp 2013-2014", x="", y="")+
+        labs(fill="Mean pub exp 2013-2014", x="", y="")+
         theme_bw()+
         theme(panel.border = element_blank())+
-        scale_fill_gradientn(colours = myPalette_rev(100), 
-                             labels = round(quantile(pred$PUBLIC_EXP_LAGGED2, c(.05,.95)),0), 
-                             breaks = round(quantile(pred$PUBLIC_EXP_LAGGED2, c(.05,.95)),0))
+        scale_fill_gradientn(colours = myPalette_rev(20), 
+                             labels = round(quantile(base_mapa_public$PUBLIC_EXP_LAGGED2, c(.01,.99)),0), 
+                             breaks = round(quantile(base_mapa_public$PUBLIC_EXP_LAGGED2, c(.01,.99)),0))
+
+base_mapa_prop <- dplyr::select(base_map, c(region_map, PROP_PUBLIC_HEALTH_EXP_LAGGED2))
+plot4 <- ggplot()+
+        geom_map(data=WorldData, map=WorldData,
+                  aes(x=long, y=lat, group=group, map_id=region),
+                  fill="white", colour="#7f7f7f", size=0.5)+
+        geom_map(data=base_mapa_prop, map=WorldData,
+                  aes(fill= PROP_PUBLIC_HEALTH_EXP_LAGGED2, map_id=region_map),
+                  colour="#7f7f7f", size=0.5)+
+        coord_map("rectangular", lat0=0, xlim=c(-190,190), ylim=c(-60, 90))+
+        labs(fill="Mean prop exp health 2013-2014", x="", y="")+
+        theme_bw()+
+        theme(panel.border = element_blank())+
+        scale_fill_gradientn(colours = myPalette_rev(20), 
+                             labels = round(quantile(base_mapa_prop$PROP_PUBLIC_HEALTH_EXP_LAGGED2, c(.01,.99)),2), 
+                             breaks = round(quantile(base_mapa_prop$PROP_PUBLIC_HEALTH_EXP_LAGGED2, c(.01,.99)),2))
 
 
-pred_poor <- subset(pred, pred$INCOME_CLASS %in% c("L", "LM"))
+base_poor <- subset(base_efi, base_efi$INCOME_CLASS %in% c("L", "LM"))
+base_poor$TAX_PPP_LAGGED2 <- NULL
+base_poor$SURFACE <- NULL
 
-names(pred_poor) <- c("LOCATION", "INCOME_CLASS",  "Var neo - poor",                
-"Var 28d<5y - poor",              "Fertility",         
-"Plus 65y",                       "GDP per cap",                    "Prop publ health exp",
-"Public exp",                     "Out of pocket",                  "Gini",                   
-"Poverty",                        "Inflation",                      "Unemployment general",           
-"Sanitation",                     "Water",                          "Unemployment fem",       
-"School",                         "Women parliament",               "School life exp",        
-"Out of school",                  "Corruption control",             "Gov effectiveness",      
-"Political stab",                 "Regulatory quality",             "Rule of law",            
-"Undernourishment",               "Doctors",                        "Delivery assistance",    
-"AIDS prevalence",                "Malaria incidence",              "DPT",                    
-"Hospital beds",                  "Electricity",                    "Urban rate",             
-"Population",                     "Pop density",                    "Longitude",                          
-"Latitude",                       "PRED_NEO",                       "IC_05_NEO",                     
-"IC_95_NEO",                      "PRED_NEO_U5",                    "IC_05_NEO_U5",                  
-"IC_95_NEO_U5",                   "IMPACT_NEO",                     "IMPACT_NEO_U5",                 
-"region_map")
+names(base_poor) <- c("LOCATION",                       "INCOME_CLASS",                "Mean neo - poor",   
+                     "Mean 28d<5y - poor",              "Fertility",                   "Plus 65y",    
+                     "GDP per cap",                     "Public exp",                  "Prop publ health exp",          
+                     "Out of pocket",                   "Gini",                        "Poverty",
+                     "Inflation",                       "Unemployment general",        "Sanitation",
+                     "Water",                           "Unemployment fem",            "School life exp fem",  
+                     "Women parliament",                "School life exp gen",         "Out of school",
+                     "Corruption control",              "Gov effectiveness",           "Political stab",
+                     "Regulatory quality",              "Rule of law",                 "Undernourishment",
+                     "Doctors",                         "Delivery assistance",         "AIDS prevalence",
+                     "Malaria incidence",               "DPT",                         "Hospital beds",
+                     "Electricity",                     "Urban rate",                  "Population",
+                     "Pop density",                     "Longitude",                   "Latitude",
+                     "PRED_NEO",                        "IC_05_NEO",                  "IC_95_NEO", 
+                     "PRED_NEO_U5",                     "IC_05_NEO_U5",                "IC_95_NEO_U5", 
+                     "IMPACT_NEO",                      "IMPACT_NEO_U5",               "HEALTH",     
+                     "NON_HEALTH",                      "EFI",                         "TARG_HEALTH", 
+                     "TARG_NON_HEALTH",                 "TARG_PROP",                   "region_map")
 
-pred_non_poor <- subset(pred, (pred$INCOME_CLASS %in% c("H", "UM")))
+base_non_poor <- subset(base_efi, (base_efi$INCOME_CLASS %in% c("H", "UM")))
+base_non_poor$TAX_PPP_LAGGED2 <- NULL
+base_non_poor$SURFACE <- NULL
 
-names(pred_non_poor) <- c("LOCATION", "INCOME_CLASS",   "Var neo - non poor",                
-"Var 28d<5y - non poor",          "Fertility",         
-"Plus 65y",                       "GDP per cap",                    "Prop publ health exp",
-"Public exp",                     "Out of pocket",                  "Gini",                   
-"Poverty",                        "Inflation",                      "Unemployment general",           
-"Sanitation",                     "Water",                          "Unemployment fem",       
-"School",                         "Women parliament",               "School life exp",        
-"Out of school",                  "Corruption control",             "Gov effectiveness",      
-"Political stab",                 "Regulatory quality",             "Rule of law",            
-"Undernourishment",               "Doctors",                        "Delivery assistance",    
-"AIDS prevalence",                "Malaria incidence",              "DPT",                    
-"Hospital beds",                  "Electricity",                    "Urban rate",             
-"Population",                     "Pop density",                    "Longitude",                          
-"Latitude",                       "PRED_NEO",                       "IC_05_NEO",                     
-"IC_95_NEO",                      "PRED_NEO_U5",                    "IC_05_NEO_U5",                  
-"IC_95_NEO_U5",                   "IMPACT_NEO",                     "IMPACT_NEO_U5",                 
-"region_map")
+names(base_non_poor) <- c("LOCATION",                   "INCOME_CLASS",                "Mean neo - non poor",   
+                     "Mean 28d<5y - non poor",         "Fertility",                   "Plus 65y",    
+                     "GDP per cap",                     "Public exp",                  "Prop publ health exp",          
+                     "Out of pocket",                   "Gini",                        "Poverty",
+                     "Inflation",                       "Unemployment general",        "Sanitation",
+                     "Water",                           "Unemployment fem",            "School life exp fem",  
+                     "Women parliament",                "School life exp gen",         "Out of school",
+                     "Corruption control",              "Gov effectiveness",           "Political stab",
+                     "Regulatory quality",              "Rule of law",                 "Undernourishment",
+                     "Doctors",                         "Delivery assistance",         "AIDS prevalence",
+                     "Malaria incidence",               "DPT",                         "Hospital beds",
+                     "Electricity",                     "Urban rate",                  "Population",
+                     "Pop density",                     "Longitude",                   "Latitude",
+                     "PRED_NEO",                        "IC_05_NEO",                  "IC_95_NEO", 
+                     "PRED_NEO_U5",                     "IC_05_NEO_U5",                "IC_95_NEO_U5", 
+                     "IMPACT_NEO",                      "IMPACT_NEO_U5",               "HEALTH",     
+                     "NON_HEALTH",                      "EFI",                         "TARG_HEALTH", 
+                     "TARG_NON_HEALTH",                 "TARG_PROP",                   "region_map")
 
 
-cor_poor <- cor(pred_poor[,c(9,11:46)], method = "kendall")[,c(1,2)]
-cor_non_poor <- cor(pred_non_poor[,c(9,11:46)], method = "kendall")[,c(1,2)] 
+cor_poor <- cor(base_poor[,c(3:39)], method = "kendall")[,c(1,2)]
+cor_non_poor <- cor(base_non_poor[,c(3:39)], method = "kendall")[,c(1,2)] 
 cor_diff <- cbind(cor_poor, cor_non_poor)
-cor_diff <-  t(cor_diff) 
-cor_diff <- cor_diff[,-c(1,2)]
-cor_diff <- cor_diff[c(1,3,2,4),c(17,1,8,23,7,26,32,27,9,4,15,28,34,18,33,10,13,20,22,31,35,6,2,3,5,19,21,24,25,29,30,11,12,16,14)]
+cor_diff <- cor_diff[-c(1,2),]
+cor_diff <- cor_diff[c(1,8,7,9,17,23,26,27,32,10,2,3,4,5,6,11,12,13,14,15,16,18,19,20,21,22,24,25,28,29,30,31,33,34,35),c(1,3,2,4)]
 
-res_poor <- cor.mtest(pred_poor[,c(9,11:46)], conf.level = .95, method = "kendall")
-res_non_poor <- cor.mtest(pred_non_poor[,c(9,11:46)], conf.level = .95, method = "kendall")
-res_diff <- cbind(res_poor$p, res_non_poor$p)
-res_diff <-  t(res_diff) 
-res_diff <- res_diff[,-c(1,2)]
-res_diff <- res_diff[c(1,3,2,4),c(17,1,8,23,7,26,32,27,9,4,15,28,34,18,33,10,13,20,22,31,35,6,2,3,5,19,21,24,25,29,30,11,12,16,14)]
+res_poor <- cor.mtest(base_poor[,c(3:39)], conf.level = .95, method = "kendall")[[1]][,c(1,2)]
+res_non_poor <- cor.mtest(base_non_poor[,c(3:39)], conf.level = .95, method = "kendall")[[1]][,c(1,2)]
+res_diff <- cbind(res_poor, res_non_poor)
+res_diff <- res_diff[-c(1,2),]
+res_diff <- res_diff[c(1,8,7,9,17,23,26,27,32,10,2,3,4,5,6,11,12,13,14,15,16,18,19,20,21,22,24,25,28,29,30,31,33,34,35), c(1,3,2,4)] 
 
-plot5 <- ggcorrplot(t(cor_diff), outline.col = "white", p.mat = t(res_diff), lab = TRUE,
-           colors = c("#9E0142", "white","#5E4FA2"),lab_size = 3.5,  insig = "blank", show.legend = F)
+plot5 <- ggcorrplot(cor_diff, outline.col = "white", p.mat = res_diff, lab = TRUE,
+           colors = c("#5E4FA2", "white","#9E0142"),lab_size = 3.5,  insig = "blank", show.legend = F)
    
 
 
-plot6 <- ggarrange(plot1, plot2, plot3, labels = c("A", "B", "C"),
+plot6 <- ggarrange(plot1, plot2, plot3,plot4, labels = c("A", "B", "C", "D"),
            common.legend = F,legend = "bottom")
 
 ggarrange(plot6, plot5, labels = c("A", "E"), nrow = 2)
@@ -238,37 +221,98 @@ ggarrange(plot6, plot5, labels = c("A", "E"), nrow = 2)
 
 
 
-A estatístic t da variável instrumental gregredida sobre a variável de tratamento e condicionada aos fatores extermos foi de `r t_stat_instr`, indicando uma associação adequada. Com base nisso, utilizou-se a variável instrumental para se estimar o efeito da variação do gasto público geral na variação das taxas de mortalidade. Os efeitos e seus intervalos de confiaça, para países pobres estão expressonas na Tabela 1.
+
+```{r fig.width=12, fig.height=16}
+base_efi[which(base_efi$INCOME_CLASS == "L"), 2] <- "Low"
+base_efi[which(base_efi$INCOME_CLASS == "LM"), 2] <- "Low-Median"
+base_efi[which(base_efi$INCOME_CLASS == "UM"), 2] <- "Upper-Median"
+base_efi[which(base_efi$INCOME_CLASS == "H"), 2] <- "High"
+base_efi$INCOME_CLASS <- factor(base_efi$INCOME_CLASS, levels = c("Low", "Low-Median", "Upper-Median", "High"))
+base_efi_poor <- subset(base_efi, base_efi$INCOME_CLASS %in% c("Low", "Low-Median"))
+base_efi_poor$pol_ic05neo <- NA
+for(i in seq_along(base_efi_poor$IC_05_NEO)){
+      base_efi_poor$pol_ic05neo[i] <- ifelse(base_efi_poor$IC_05_NEO[i] > 0, "pos", "neg")
+}
+base_efi_poor$pol_ic95neo <- NA
+for(i in seq_along(base_efi_poor$IC_95_NEO)){
+      base_efi_poor$pol_ic95neo[i] <- ifelse(base_efi_poor$IC_95_NEO[i] > 0, "pos", "neg")
+}
+base_efi_poor$sig_neo <- NA
+for(i in seq_along(base_efi_poor$IC_95_NEO)){
+      base_efi_poor$sig_neo[i] <- ifelse(base_efi_poor$pol_ic05neo[i] == base_efi_poor$pol_ic95neo[i], "yes", "no")
+}
+
+base_efi_poor$pol_ic05neo_u5 <- NA
+for(i in seq_along(base_efi_poor$IC_05_NEO_U5)){
+      base_efi_poor$pol_ic05neo_u5[i] <- ifelse(base_efi_poor$IC_05_NEO_U5[i] > 0, "pos", "neg")
+}
+base_efi_poor$pol_ic95neo_u5 <- NA
+for(i in seq_along(base_efi_poor$IC_95_NEO_U5)){
+      base_efi_poor$pol_ic95neo_u5[i] <- ifelse(base_efi_poor$IC_95_NEO_U5[i] > 0, "pos", "neg")
+}
+base_efi_poor$sig_neo_u5 <- NA
+for(i in seq_along(base_efi_poor$IC_95_NEO_U5)){
+      base_efi_poor$sig_neo_u5[i] <- ifelse(base_efi_poor$pol_ic05neo_u5[i] == base_efi_poor$pol_ic95neo_u5[i], "yes", "no")
+}
 
 
-```{r effect_predictions}
+plot1 <- ggplot(base_efi_poor)+
+   geom_point(aes(PRED_NEO,reorder(LOCATION, PRED_NEO), colour = sig_neo))+
+   geom_segment(aes(x = IC_05_NEO, xend = IC_95_NEO, y = LOCATION, yend = LOCATION, colour = sig_neo))+
+   geom_vline(xintercept = 0, linetype = "dashed", colour = "black")+
+   labs(x = "Treatment neo", y = "")+
+   theme_bw()+
+   scale_y_discrete(position = "left")+
+   scale_colour_manual(values = myPalette_rev(2), aesthetics = "colour", "Significant")
+plot2 <- ggplot(base_efi_poor)+
+   geom_point(aes(PRED_NEO_U5,reorder(LOCATION, PRED_NEO_U5),, color = sig_neo_u5))+
+   geom_segment(aes(x = IC_05_NEO_U5, xend = IC_95_NEO_U5, y = LOCATION, yend = LOCATION, color = sig_neo_u5))+
+   geom_vline(xintercept = 0, linetype = "dashed", colour = "black")+
+   labs(x = "Treatment 28d>5y", y = "")+
+   theme_bw()+
+   scale_y_discrete(position = "right")+
+   scale_colour_manual(values = myPalette_rev(2), aesthetics = "colour")
+ggarrange(plot1, plot2, ncol = 2, labels = c("A", "B"),legend = "bottom", common.legend = T)
+
+```
+
+
+
+
+
+```{r }
 # Create a table of the effect of the treatment
-pred[which(pred$INCOME_CLASS == "L"), 2] <- "Low"
-pred[which(pred$INCOME_CLASS == "LM"), 2] <- "Low-Median"
-pred[which(pred$INCOME_CLASS == "UM"), 2] <- "Upper-Median"
-pred[which(pred$INCOME_CLASS == "H"), 2] <- "High"
-pred$INCOME_CLASS <- factor(pred$INCOME_CLASS, levels = c("Low", "Low-Median", "Upper-Median", "High"))
-pred$IC_NEO <- paste0("(CI95% ",round(pred$IC_05_NEO,7), " ", round(pred$IC_95_NEO,7),")")
-pred$IC_NEO_U5 <- paste0("(CI95% ",round(pred$IC_05_NEO_U5,7), " ", round(pred$IC_95_NEO_U5,7),")")
-pred$PRED_NEO <- round(pred$PRED_NEO,7)
-pred$PRED_NEO_U5 <- round(pred$PRED_NEO_U5,7)
-pred$PRED_NEO <- paste0(pred$PRED_NEO," ",pred$IC_NEO)
-pred$PRED_NEO_U5 <- paste0(pred$PRED_NEO_U5," ",pred$IC_NEO_U5)
-
-pred_table <- subset(pred, pred$INCOME_CLASS %in% c("Low", "Low-Median"))
-pred_table$MEAN_RATE_NEO <- round(pred_table$MEAN_RATE_NEO,3)
-pred_table$MEAN_RATE_NEO_U5 <- round(pred_table$MEAN_RATE_NEO_U5,3)
-pred_table$PUBLIC_EXP_LAGGED2 <- round(pred_table$PUBLIC_EXP_LAGGED2,2)
-pred_table$PUBLIC_EXP_LAGGED2 <- paste0("US$",pred_table$PUBLIC_EXP_LAGGED2)
+base_efi_table <- base_efi_poor
+base_efi_table$IC_NEO <- paste0("(CI95% ",round(base_efi_table$IC_05_NEO,7), " ", round(base_efi_table$IC_95_NEO,7),")")
+base_efi_table$IC_NEO_U5 <- paste0("(CI95% ",round(base_efi_table$IC_05_NEO_U5,7), " ", round(base_efi_table$IC_95_NEO_U5,7),")")
+base_efi_table$PRED_NEO <- round(base_efi_table$PRED_NEO,7)
+base_efi_table$PRED_NEO_U5 <- round(base_efi_table$PRED_NEO_U5,7)
+base_efi_table$PRED_NEO <- paste0(base_efi_table$PRED_NEO," ",base_efi_table$IC_NEO)
+base_efi_table$PRED_NEO_U5 <- paste0(base_efi_table$PRED_NEO_U5," ",base_efi_table$IC_NEO_U5)
+base_efi_table$MEAN_RATE_NEO <- round(base_efi_table$MEAN_RATE_NEO,3)
+base_efi_table$MEAN_RATE_NEO_U5 <- round(base_efi_table$MEAN_RATE_NEO_U5,3)
+base_efi_table$PUBLIC_EXP_LAGGED2 <- round(base_efi_table$PUBLIC_EXP_LAGGED2,2)
+base_efi_table$PUBLIC_EXP_LAGGED2 <- paste0("US$",base_efi_table$PUBLIC_EXP_LAGGED2)
                                  
-pred_table <- pred_table %>%
+
+base_efi_table <- base_efi_table %>%
      dplyr::select("LOCATION", "MEAN_RATE_NEO", 
                    "MEAN_RATE_NEO_U5", "PUBLIC_EXP_LAGGED2", 
-                   "PRED_NEO", "PRED_NEO_U5")
+                   "PRED_NEO", "PRED_NEO_U5",
+                   "IMPACT_NEO","TARG_IMPACT_NEO", 
+                   "IMPACT_NEO_U5", "TARG_IMPACT_NEO_U5", 
+                   "EFI","PROP_PUBLIC_HEALTH_EXP_LAGGED2",
+                   "TARG_PROP")
 
-names(pred_table) <- c("Country", "Var Neo", "Var 28d>5y", "Var Public Exp", "Treat Effect Neo", "Treat Effect 28d>5y")
+names(base_efi_table) <- c("Country", "Mean Neo", 
+                           "Mean 28d>5y", "Mean Public Exp", 
+                           "Cost-Effect Neo", "Cost-Effect 28d>5y", 
+                           "Impact Neo", "Targ Impact Neo", 
+                           "Impact 28d>5y", "Targ Impact 28d>5y",
+                           "Efficiency", "Prop Public Exp to Health", 
+                           "Targ Prop Public Exp to Health")
 
-knitr::kable(pred_table)
+knitr::kable(base_efi_table, digits = 7)
 
 ```
 
@@ -276,34 +320,34 @@ knitr::kable(pred_table)
 Ao se analisar a relação entre impacto e eficiência, alguns países destacam-se como o Senegal, que aprenseta um baixo desenvolvimento econômico, mas que está acima do percentil 80 tanto em relação à eficiência, quanto ao impacto do governos na mortalidade neonatal e na mortalida de crianças. A distribuição dos países pobres segundo o impacto e a eficiência de seus governos pode ser observado na Figura 2 e os dados na Tabela 2.
 ```{r fig.width=16, fig.height=8}
 
-effect_effici <- base_efi
+effect_effici <- subset(base_efi_poor, !is.na(base_efi_poor$EFI))
 
 plot1 <- ggplot(effect_effici,aes(EFI, IMPACT_NEO))+
             geom_text(label = effect_effici$LOCATION,check_overlap = T, size =3)+
-            geom_vline(xintercept = quantile(effect_effici$EFI,.8))+
-            geom_hline(yintercept = quantile(effect_effici$IMPACT_NEO,.8))+
-            #geom_smooth(method = "lm")+
+            geom_smooth(method = "lm" )+
             labs(y = "Impact neo", x = "Efficiency")+
             theme_bw()
-      
+
 plot2 <- ggplot(effect_effici,aes(EFI, IMPACT_NEO_U5))+
             geom_text(label = effect_effici$LOCATION,check_overlap = T, size =3)+
-            geom_vline(xintercept = quantile(effect_effici$EFI,.8))+
-            geom_hline(yintercept = quantile(effect_effici$IMPACT_NEO_U5,.8))+
-            #geom_smooth(method = "lm")+
-            labs(y = "Impact 28d>5y", x = "Efficiency")+
+            geom_smooth(method = "lm" )+
+            labs(y = "Impact neo", x = "Efficiency")+
             theme_bw()
 
 ggarrange(plot1, plot2, ncol = 2, labels = c("A", "B"))
 ```
 
 
+
+
 #Proportion of Public Health Spending and Efectiveness
 ##Impact Neo
 ```{r }
 
-impneo_prop_kend <- cor(as.matrix(dplyr::select(base_efi, c(IMPACT_NEO, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
-impneo_prop_sig <- cor.mtest(as.matrix(dplyr::select(base_efi, c(IMPACT_NEO, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
+impneo <- subset(base_efi_poor, base_efi_poor$sig_neo == "yes")
+
+impneo_prop_kend <- cor(as.matrix(dplyr::select(impneo, c(IMPACT_NEO, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
+impneo_prop_sig <- cor.mtest(as.matrix(dplyr::select(impneo, c(IMPACT_NEO, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
 impneo_prop_kend[1,2]
 impneo_prop_sig$p[1,2]
 ```
@@ -312,9 +356,10 @@ impneo_prop_sig$p[1,2]
 
 ##Impact 28d<5y
 ```{r }
+impneo_u5 <- subset(base_efi_poor, base_efi_poor$sig_neo_u5 == "yes")
 
-imp28d5y_prop_kend <- cor(as.matrix(dplyr::select(base_efi, c(IMPACT_NEO_U5, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
-imp28d5y_prop_sig <- cor.mtest(as.matrix(dplyr::select(base_efi, c(IMPACT_NEO_U5, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall",conf.level = .95)
+imp28d5y_prop_kend <- cor(as.matrix(dplyr::select(impneo_u5, c(IMPACT_NEO_U5, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
+imp28d5y_prop_sig <- cor.mtest(as.matrix(dplyr::select(impneo_u5, c(IMPACT_NEO_U5, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall",conf.level = .95)
 imp28d5y_prop_kend[1,2]
 imp28d5y_prop_sig$p[1,2]
 ```
@@ -324,9 +369,8 @@ imp28d5y_prop_sig$p[1,2]
 
 ##Efficiency
 ```{r }
-
-efi_prop_kend <- cor(as.matrix(dplyr::select(base_efi, c(EFI, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
-efi_prop_sig <- cor.mtest(as.matrix(dplyr::select(base_efi, c(EFI, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
+efi_prop_kend <- cor(as.matrix(dplyr::select(effect_effici, c(EFI, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall")
+efi_prop_sig <- cor.mtest(as.matrix(dplyr::select(effect_effici, c(EFI, PROP_PUBLIC_HEALTH_EXP_LAGGED2))), method = "kendall" )
 efi_prop_kend[1,2]
 efi_prop_sig$p[1,2]
 ```
@@ -334,45 +378,46 @@ efi_prop_sig$p[1,2]
 
 
 
-
-
-
 ```{r fig.width=16, fig.height=8}
-plot1 <- ggplot(base_efi, aes(PROP_PUBLIC_HEALTH_EXP_LAGGED2,IMPACT_NEO))+
+plot1 <- ggplot(impneo, aes(PROP_PUBLIC_HEALTH_EXP_LAGGED2,IMPACT_NEO))+
             geom_jitter(aes(color = LOCATION))+
-            geom_smooth(method = "loess", bs="cr", se = T, color = "#5E4FA2")+
+            geom_smooth(method = "lm", bs="cr", se = T, color = "#5E4FA2")+
             labs(fill="", x="Prop health exp", y="Impact neo")+
             theme_bw()+ 
             theme(legend.position = "none") 
-plot2 <- ggplot(base_efi, aes(PROP_PUBLIC_HEALTH_EXP_LAGGED2,IMPACT_NEO_U5))+
+plot2 <- ggplot(impneo_u5, aes(PROP_PUBLIC_HEALTH_EXP_LAGGED2,IMPACT_NEO_U5))+
             geom_jitter(aes(color = LOCATION))+
-            geom_smooth(method = "loess", se = T, color = "#5E4FA2")+
+            geom_smooth(method = "lm", se = T, color = "#5E4FA2")+
             labs(fill="", x="Prop health exp", y="Impact 28d>5y")+
             theme_bw()+ 
             theme(legend.position = "none")
-plot3 <- ggplot(base_efi, aes(PROP_PUBLIC_HEALTH_EXP_LAGGED2,EFI))+
+plot3 <- ggplot(effect_effici, aes(PROP_PUBLIC_HEALTH_EXP_LAGGED2,EFI))+
             geom_jitter(aes(color = LOCATION))+
-            geom_smooth(method = "loess", se = T, color = "#5E4FA2")+
-            labs(fill="", x="Prop health exp", y="Efficiency")+
+            geom_smooth(method = "lm", se = T, color = "#5E4FA2")+
+            labs(fill="", x="Prop health exp", y="Efficiency neo")+
             theme_bw()+ 
             theme(legend.position = "none")
 
 
-ggarrange(plot1, plot2, plot3, nrow = 3,
-          labels = c("A", "B", "C"))
+plot4 <- ggarrange(plot1, plot2, nrow = 1,ncol = 2,
+          labels = c("A", "B"))
+
+ggarrange(plot4, plot3,nrow = 2,ncol = 1,
+          labels = c("A", "C"))
+
 
 ```
 
 
-```{r fig.width=12, fig.height=16}
+```{r fig.width=12, fig.height=8}
 
-plot1 <- ggplot(base_efi)+
+plot1 <- ggplot(effect_effici)+
    geom_point(aes(TARG_PROP,reorder(LOCATION, TARG_IMPACT_NEO_U5)), color = "#9E0142")+
    geom_segment(aes(x = PROP_PUBLIC_HEALTH_EXP_LAGGED2, xend = TARG_PROP, y = LOCATION, yend = LOCATION), color = "#9E0142")+
-   labs(x = "Target prop health exp", y = "")+
+   labs(x = "Target prop health exp neo", y = "")+
    theme_bw()
 
-plot2 <- ggplot(base_efi)+
+plot2 <- ggplot(effect_effici)+
    geom_point(aes(TARG_IMPACT_NEO,reorder(LOCATION, TARG_IMPACT_NEO_U5)), color = "#5E4FA2")+
    geom_segment(aes(x = IMPACT_NEO, xend = TARG_IMPACT_NEO, y = LOCATION, yend = LOCATION), color = "#5E4FA2")+
    labs(x = "Target impact neo", y = "")+
@@ -381,7 +426,7 @@ plot2 <- ggplot(base_efi)+
          axis.text.y=element_blank(),
          axis.ticks.y=element_blank())
 
-plot3 <- ggplot(base_efi)+
+plot3 <- ggplot(effect_effici)+
    geom_point(aes(TARG_IMPACT_NEO_U5,reorder(LOCATION, TARG_IMPACT_NEO_U5)), color = "#5E4FA2")+
    geom_segment(aes(x = IMPACT_NEO_U5, xend = TARG_IMPACT_NEO_U5, y = LOCATION, yend = LOCATION), color = "#5E4FA2")+
    labs(x = "Target impact 28d>5y", y = "")+
@@ -394,22 +439,5 @@ ggarrange(plot1, plot2, plot3, ncol = 3, widths = c(1.5, 1, 1.5))
 
 
 
-
-
-```{r impact_efficiency}
-# Create a table of impact and efficiency
-base_efi_table <- base_efi
-base_efi_table <- base_efi_table %>%
-     dplyr::select("LOCATION","IMPACT_NEO","TARG_IMPACT_NEO",
-                              "IMPACT_NEO_U5","TARG_IMPACT_NEO_U5",
-                              "EFI","PROP_PUBLIC_HEALTH_EXP_LAGGED2","TARG_PROP",)
-
-names(base_efi_table) <- c("Country", "Impact Neo", "Targ Impact Neo", 
-                           "Impact 28d>5y", "Targ Impact 28d>5y",
-                           "Efficiency", "Prop Public Exp to Health", "Targ Prop Public Exp to Health")
-
-knitr::kable(base_efi_table)
-
-```
 
 

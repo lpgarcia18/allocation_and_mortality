@@ -30,55 +30,78 @@ pred$HEALTH <- pred$PUBLIC_EXP_LAGGED2 * pred$PROP_PUBLIC_HEALTH_EXP_LAGGED2
 pred$NON_HEALTH <- pred$PUBLIC_EXP_LAGGED2 -  pred$HEALTH
 
 #Mantaining only treatments negatives with 0.05 of signf.
-pred_cut <- subset(pred, pred$IC_95_NEO < 0)
-pred_cut <- subset(pred_cut, pred_cut$IC_95_NEO_U5 < 0)
+#neo
+pred_cut_neo <- subset(pred, pred$sig_neo == "yes")
 
 
-variables <- c("LOCATION", "INCOME_CLASS", "IMPACT_NEO", "IMPACT_NEO_U5",
+
+variables <- c("LOCATION", "INCOME_CLASS", "IMPACT_NEO", 
                "HEALTH", "NON_HEALTH") 
 
-base <- pred_cut
+base_neo <- pred_cut_neo
 
-base <- dplyr::select(base, variables) 
-base_poor <- subset(base, base$INCOME_CLASS %in% c("L", "LM"))
-base_rich <- subset(base, base$INCOME_CLASS %in% c("UM", "H"))
-base <- rbind(base_poor, base_rich)
+base_neo <- dplyr::select(base_neo, variables) 
 
 
-base_dea <- read_data(datadea = base,
+base_dea_neo <- read_data(datadea = base_neo,
                         dmus = 1,
                         ni = 2,
                         no = 2,
-                        inputs = c(5:6) ,
-                        outputs = c(3,4))
-model_voo <- model_sbmeff(datadea = base_dea,
-                              dmu_ref = 1:nrow(base), #All countries
-                              dmu_eval =  1:nrow(base_poor), #Poor countries (L, LM)
+                        inputs = c(4,5), 
+                        outputs = c(3))
+model_voo_neo <- model_sbmeff(datadea = base_dea_neo,
+                              dmu_ref = 1:nrow(base_neo), 
+                              dmu_eval =  1:nrow(base_neo), 
                               orientation = "oo",
                               rts = "vrs",
                               compute_target = TRUE,
                               returnlp = FALSE)
 
 
-efi_voo <- efficiencies(model_voo)
+efi_voo_neo <- efficiencies(model_voo_neo)
 
-efi_targ_helth <- targets(model_voo)[[1]][,1]
-efi_targ_non_helth <- targets(model_voo)[[1]][,2]
-efi_targ_impact_neo <- targets(model_voo)[[2]][,1] 
-efi_targ_impact_neo_u5 <- targets(model_voo)[[2]][,2] 
+efi_neo <- data.frame(EFI_NEO = efi_voo_neo)
 
+efi_neo$LOCATION <- row.names(efi_neo)
 
-efi <- data.frame(EFI = efi_voo,
-                  TARG_HEALTH = efi_targ_helth, 
-                  TARG_NON_HEALTH = efi_targ_non_helth,
-                  TARG_IMPACT_NEO = efi_targ_impact_neo,
-                  TARG_IMPACT_NEO_U5 = efi_targ_impact_neo_u5)
-efi$TARG_PROP <- efi$TARG_HEALTH/(efi$TARG_HEALTH+efi$TARG_NON_HEALTH)
-
-efi$LOCATION <- row.names(efi)
+#Mantaining only treatments negatives with 0.05 of signf.
+#28d>5y
+pred_cut_neo_u5 <- subset(pred, pred$sig_neo_u5 == "yes")
 
 
-base_efi <- merge(pred, efi, by = "LOCATION", all = T)
+
+variables <- c("LOCATION", "INCOME_CLASS", "IMPACT_NEO_U5",
+               "HEALTH", "NON_HEALTH") 
+
+base_neo_u5 <- pred_cut_neo_u5
+
+base_neo_u5 <- dplyr::select(base_neo_u5, variables) 
+
+
+base_dea_neo_u5 <- read_data(datadea = base_neo_u5,
+                        dmus = 1,
+                        ni = 2,
+                        no = 2,
+                        inputs = c(4,5), 
+                        outputs = c(3))
+model_voo_neo_u5 <- model_sbmeff(datadea = base_dea_neo_u5,
+                              dmu_ref = 1:nrow(base_neo_u5), 
+                              dmu_eval =  1:nrow(base_neo_u5), 
+                              orientation = "oo",
+                              rts = "vrs",
+                              compute_target = TRUE,
+                              returnlp = FALSE)
+
+
+efi_voo_neo_u5 <- efficiencies(model_voo_neo_u5)
+
+efi_neo_u5 <- data.frame(EFI_NEO_U5 = efi_voo_neo_u5)
+
+efi_neo_u5$LOCATION <- row.names(efi_neo_u5)
+
+#Merging
+base_efi <- merge(pred, efi_neo, by = "LOCATION", all = T)
+base_efi <- merge(base_efi, efi_neo_u5, by = "LOCATION", all = T)
 
 
 #########################################################################

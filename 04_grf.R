@@ -24,8 +24,7 @@ library(AER)
 #########################################################################
 completed_base <- read_csv("bases/completed_base.csv")
 names(completed_base)[1] <- "LOCATION"
-#completed_base$PUBLIC_EXP_LAGGED2 <- round(completed_base$PUBLIC_EXP_LAGGED2,0) 
-#completed_base$TAX_PPP_LAGGED3 <- round(completed_base$TAX_PPP_LAGGED3,0) 
+completed_base <- subset(completed_base, completed_base$INCOME_CLASS %in% c("L", "LM"))
 
 
 #########################################################################
@@ -71,20 +70,20 @@ clust <- as.numeric(as.factor(completed_base$INCOME_CLASS))
 #Effect neo
 cs_neo_raw <- causal_forest(X, Y_neo, W, 
                     Y_neo.hat, W.hat,
-                    clusters = clust,
+                    #clusters = clust,
                     tune.parameters = T,
                     honesty = T,
-                    num.trees = 150000,   
+                    num.trees = 200000,   
                     compute.oob.predictions = TRUE,
                     seed = 233)
 varimp_neo <- variable_importance(cs_neo_raw)
 selected_idx_neo <- which(varimp_neo > mean(varimp_neo))
 cs_neo <- causal_forest(X[,selected_idx_neo], Y_neo, W, 
                     Y_neo.hat, W.hat, 
-                    clusters = clust,
+                    #clusters = clust,
                     tune.parameters = T,
                     honesty = T,
-                    num.trees = 150000, 
+                    num.trees = 200000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 pred_neo <- predict(cs_neo, newdata = NULL, estimate.variance = TRUE, set.seed(233))
@@ -96,20 +95,20 @@ pred_neo$IC_05_NEO <- pred_neo$predictions-(1.96*(sqrt(pred_neo$variance.estimat
 #Effect neo_u5
 cs_neo_u5_raw <- causal_forest(X, Y_neo_u5, W, 
                     Y_neo_u5.hat, W.hat, 
-                    clusters = clust,
+                    #clusters = clust,
                     tune.parameters = T,
                     honesty = T,
-                    num.trees = 150000, 
+                    num.trees = 200000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 varimp_neo_u5 <- variable_importance(cs_neo_u5_raw)
 selected_idx_neo_u5 <- which(varimp_neo_u5 > mean(varimp_neo_u5))
 cs_neo_u5 <- causal_forest(X[,selected_idx_neo_u5], Y_neo_u5, W, 
                     Y_neo_u5.hat, W.hat,
-                    clusters = clust,
+                    #clusters = clust,
                     tune.parameters = T,
                     honesty = T,
-                    num.trees = 150000, 
+                    num.trees = 200000, 
                     compute.oob.predictions = TRUE,
                     seed = 233)
 pred_neo_u5 <- predict(cs_neo_u5, newdata = NULL, estimate.variance = TRUE, set.seed(233))
@@ -118,16 +117,54 @@ pred_neo_u5$IC_95_NEO_U5 <- pred_neo_u5$predictions+(1.96*(sqrt(pred_neo_u5$vari
 pred_neo_u5$IC_05_NEO_U5 <- pred_neo_u5$predictions-(1.96*(sqrt(pred_neo_u5$variance.estimates)))#"The square-root of column ’variance.estimates’ is the standard error of CATE" - https://cran.r-project.org/web/packages/grf/grf.pdf
 
 pred <- cbind(completed_base, pred_neo[,c(5,7,6)], pred_neo_u5[,c(5,7,6)])
-pred$IMPACT_NEO <- pred$PRED_NEO *-1
-pred$IMPACT_NEO_U5 <- pred$PRED_NEO_U5 *-1  
+
+pred$pol_ic05neo <- NA
+for(i in seq_along(pred$IC_05_NEO)){
+      pred$pol_ic05neo[i] <- ifelse(pred$IC_05_NEO[i] > 0, "pos", "neg")
+}
+pred$pol_ic95neo <- NA
+for(i in seq_along(pred$IC_95_NEO)){
+      pred$pol_ic95neo[i] <- ifelse(pred$IC_95_NEO[i] > 0, "pos", "neg")
+}
+pred$sig_neo <- NA
+for(i in seq_along(pred$IC_95_NEO)){
+      pred$sig_neo[i] <- ifelse(pred$pol_ic05neo[i] == pred$pol_ic95neo[i], "yes", "no")
+}
+
+pred$pol_ic05neo_u5 <- NA
+for(i in seq_along(pred$IC_05_NEO_U5)){
+      pred$pol_ic05neo_u5[i] <- ifelse(pred$IC_05_NEO_U5[i] > 0, "pos", "neg")
+}
+pred$pol_ic95neo_u5 <- NA
+for(i in seq_along(pred$IC_95_NEO_U5)){
+      pred$pol_ic95neo_u5[i] <- ifelse(pred$IC_95_NEO_U5[i] > 0, "pos", "neg")
+}
+pred$sig_neo_u5 <- NA
+for(i in seq_along(pred$IC_95_NEO_U5)){
+      pred$sig_neo_u5[i] <- ifelse(pred$pol_ic05neo_u5[i] == pred$pol_ic95neo_u5[i], "yes", "no")
+}
+
+pred$IMPACT_NEO <- NA 
+for(i in seq_along(pred$PRED_NEO)){
+   pred$IMPACT_NEO[i] <- ifelse(pred$sig_neo[i] == "yes", -1 * pred$PRED_NEO[i] * pred$PUBLIC_EXP_LAGGED2[i], NA)
+}
+
+pred$IMPACT_NEO_U5 <- NA
+for(i in seq_along(pred$PRED_NEO_U5)){
+   pred$IMPACT_NEO_U5[i] <- ifelse(pred$sig_neo_u5[i] == "yes", -1 * pred$PRED_NEO_U5[i] * pred$PUBLIC_EXP_LAGGED2[i], NA)
+}
 
 ape_neo <- average_partial_effect(cs_neo, subset = NULL)
-ape_neo_ci95 <- as.numeric(ape_neo[1]) + 1.96 * sqrt(as.numeric(ape_neo[2]))
-ape_neo_ci05 <- as.numeric(ape_neo[1]) - 1.96 * sqrt(as.numeric(ape_neo[2]))
+ape_neo_ci95 <- as.numeric(ape_neo[1]) + 1.96 * as.numeric(ape_neo[2])
+ape_neo_ci05 <- as.numeric(ape_neo[1]) - 1.96 * as.numeric(ape_neo[2])
+
+paste0(round(ape_neo[1],6), " (CI95%", round(ape_neo_ci95,6)," ", round(ape_neo_ci05,6), ")")
 
 ape_neo_u5 <- average_partial_effect(cs_neo_u5, subset = NULL)
-ape_neo_u5_ci95 <- as.numeric(ape_neo_u5[1]) + 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
-ape_neo_u5_ci05 <- as.numeric(ape_neo_u5[1]) - 1.96 * sqrt(as.numeric(ape_neo_u5[2]))
+ape_neo_u5_ci95 <- as.numeric(ape_neo_u5[1]) + 1.96 * as.numeric(ape_neo_u5[2])
+ape_neo_u5_ci05 <- as.numeric(ape_neo_u5[1]) - 1.96 * as.numeric(ape_neo_u5[2])
+
+paste0(round(ape_neo_u5[1],6), " (CI95%", round(ape_neo_u5_ci95,6)," ", round(ape_neo_u5_ci05,6), ")")
 
 
 

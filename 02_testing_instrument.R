@@ -24,14 +24,12 @@ library(AER)
 #########################################################################
 completed_base <- read_csv("bases/completed_base.csv")
 names(completed_base)[1] <- "LOCATION"
-#completed_base$PUBLIC_EXP_LAGGED2 <- round(completed_base$PUBLIC_EXP_LAGGED2,0) 
-#completed_base$TAX_PPP_LAGGED3 <- round(completed_base$TAX_PPP_LAGGED3,0) 
+completed_base <- subset(completed_base, completed_base$INCOME_CLASS %in% c("L", "LM"))
 
 
 #########################################################################
 #Impact of Public Expenditure on Mortality
 #########################################################################
-# Impact on Neontatal Mortality -------------------------------------------
 
 demography <- c("FERTILITY_RATE_LAGGED","URBAN_RATE_LAGGED", "POP_DENS", "PLUS_65_YEARS_LAGGED")
 geography <- c("LONG", "LAT")
